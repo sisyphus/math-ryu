@@ -1,0 +1,81 @@
+=pod
+
+=head1 NAME
+
+Math::Ryu::L - perl interface to Ryu (NV-to-string conversion) for long doubles.
+
+=head1 DEPENDENCIES
+
+   This module uses the Ryu C implementation,  which is included with
+   this module's source. It is therefore unnecessary to download that
+   Ryu code - but, should you wish to grab it, it's available at:
+   https://github.com/ulfjack/ryu/tree/master/ryu
+
+=head1 DESCRIPTION
+
+   Convert a (long double) NV to a decimal string, such that no information
+   is lost, yet keeping the string as short as possible.
+
+=head1 SYNOPSIS
+
+   use Math::Ryu::L qw(:all);
+
+=head1 FUNCTIONS
+
+   $str = ld2s($nv);
+    $nv holds a long double floating point numeric value (NV).
+    $str is a string in floating point format, that accurately
+    and succinctly represents the value held by $nv.
+    $str, when correctly assigned back to a perl number, will
+    always be equivalent to $nv.
+    This in stark contrast to perl's interpolation which does not
+    guarantee that the condition ("$nv" == $nv) is true, even for
+    non-nan values of $nv. (Eg if $nv is sqrt 2.0 or 1.4/10 .)
+    Also, $str will contain as few digits as possible, without
+    compromising that accuracy.
+    Arguments that are not an NV will cause an exception.
+
+   $str = n2s($sv);
+    If the argument is a long double floating point numeric value,
+    then this function returns the same as ld2s().
+    Otherwise, it stringifies the numeric value of the given
+    argument, according to whether that numeric value is an
+    integer value (that fits into an IV or UV) or a floating
+    point value.
+    If you want to know what happens when the argument is neither
+    a reference, nor an IV/UV, nor a string (PV) nor a floating
+    point value (NV), then you'll have to test that yourself ;-)
+
+  $str = fmtpy($s);
+    The argument $s is a string as returned by d2(s) or n2s().
+    We reformat this string to be the same as the string that
+    python3 produces and return it as $str.
+
+=head1 TODO
+
+    Cover larger __float128 NV type.
+
+=head1 LICENSE
+
+    This perl module is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.
+    However, the ".c" and ".h" files that ship with this distro
+    are Copyright 2018 Ulf Adams, and can only be used under the
+    the terms of version 2.0 the Apache License, or of version 1.0
+    of the Boost Software License.
+    A copy of the Apache License (Apache_License.txt) is included
+    with this distro.
+
+    The Apache License can also be found at:
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    The Boost Software License can be found at:
+    https://www.boost.org/LICENSE_1_0.txt
+
+    This perl module is Copyright 2024 Sisyphus
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut
