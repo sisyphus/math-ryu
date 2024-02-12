@@ -13,7 +13,7 @@
 #include <ryu.h>
 #include <ryu_parse.h>
 
-#ifndef _MSC_VER
+#ifdef COMPILER_HAS_UINT128_T
 #  define __STDC_WANT_DEC_FP__ 1
 #  include <ryu.h>
 #  include <generic_128.h>    /* modified to include stdbool.h */
@@ -106,6 +106,14 @@ int ryu_lln(pTHX_ SV * sv) {
   return looks_like_number(sv);
 }
 
+int _compiler_has_uint128(void) {
+#ifdef COMPILER_HAS_UINT128_T
+   return 1;
+#else
+   return 0;
+#endif
+}
+
 
 MODULE = Math::Ryu  PACKAGE = Math::Ryu PREFIX = M_RYU_
 
@@ -157,3 +165,6 @@ int ryu_lln (sv)
 CODE:
   RETVAL = ryu_lln (aTHX_ sv);
 OUTPUT:  RETVAL
+
+int
+_compiler_has_uint128 ()

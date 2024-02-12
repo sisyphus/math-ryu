@@ -3,12 +3,51 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Cwd;
 
+if($Config::Config{nvtype} eq '__float128') {
+  print "  Math::Ryu is not yet usable with a \"__float128\" build of perl.\n";
+  exit 0;
+}
+
+if($Config::Config{nvsize} != 8 && $Config::Config{nvtype} eq 'long double'
+   && defined($Config::Config{longdblkind}) && $Config::Config{longdblkind} < 3) {
+  print "  Math::Ryu is not yet usable with an \"IEEE 754 long double\" build of perl.\n";
+  exit 0;
+}
+
+# We need to know whether the uint128_t type is available.
+my $defines = '';
+
+my $mycc    = '';
+
+if(@ARGV) {
+  for my $arg(@ARGV) {
+    $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+  }
+}
+
+unless($mycc) {
+  $mycc = defined($Config::Config{cc}) ? $Config::Config{cc} : 'cc';
+}
+
+my $out = `$mycc -o have_uint128_t.exe -x c have_uint128_t.in 2>&1`;
+
+unless(-e 'have_uint128_t.exe') {
+  print "  The __uint128_t type is unavailable\n";
+  if($Config::Config{nvsize} != 8) {
+    print "  We are unable to continue for this type of NV ($Config::Config{nvtype})\n";
+    exit 0;
+  }
+}
+else {
+  $defines .= " -DCOMPILER_HAS_UINT128_T";
+}
+
 my $top_dir = getcwd();
 $top_dir =~ s/\\/\//g;
 
 my $lib_loc = 'Ryu_Library/ryu';
 
-unless($Config::Config{make} eq 'nmake') {
+if($defines) {
   ## BUILD RYU LIBRARY ##
   if(chdir "./$lib_loc") {
     my $make = $Config::Config{make};
@@ -20,14 +59,6 @@ unless($Config::Config{make} eq 'nmake') {
   die "Can't find libryu.a"
     unless -e "./${lib_loc}/libryu.a";
 }
-
-if($Config::Config{nvtype} eq '__float128') {
-  print "  Math::Ryu is not is usable with this build of perl.\n";
-  exit 0;
-}
-
-
-my $defines = '';
 
 my %options = (
 
@@ -50,11 +81,15 @@ my %options = (
   },
 );
 
-if($Config::Config{make} eq 'nmake') {
+if(!$defines) {
+  # Compile d2s.c, s2d.c and d2fixed.c
+  # NOTE: The current ryu/Makefile won't work with 'nmake'.
   $options{OBJECT} = '$(O_FILES)';
   #$ENV{INCLUDE} .= ";${top_dir}/${lib_loc};";
 }
 else {
+  # Build libryu.a and build against it
+
   $options{LIBS} = [ "-L${top_dir}/${lib_loc} -lryu" ];
 }
 WriteMakefile(%options);

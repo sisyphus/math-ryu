@@ -43,19 +43,29 @@ BEGIN {
   }
 };  # close BEGIN{} block
 
-use constant PV_NV_BUG => $Math::Ryu::PV_NV_BUG;
-use constant IVSIZE    => $Config{ivsize};
+BEGIN {
+  if($Config{nvsize} == 8)               { $::max_dig = 17 }
+  elsif($Config{nvtype} eq '__float128') { $::max_dig = 36 }
+  elsif(defined($Config{longdblkind})
+        && $Config{longdblkind} < 3)     { $::max_dig = 36 }
+  else                                   { $::max_dig = 21 }
+
+};  # close BEGIN{} block
+
+use constant PV_NV_BUG   => $Math::Ryu::PV_NV_BUG;
+use constant IVSIZE      => $Config{ivsize};
+use constant MAX_DEC_DIG => $::max_dig; # set in second BEGIN{} block
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
 our $VERSION = '1.0';
-#$VERSION = eval $VERSION;
+
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
-  d2s ld2s
+  d2s ld2s q2s nv2s
   n2s
   s2d
   fmtpy
@@ -68,6 +78,14 @@ my @tagged = qw(
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
+sub nv2s {
+  my $nv = shift;
+  return fmtpy( d2s($nv)) if MAX_DEC_DIG == 17;
+  return fmtpy(ld2s($nv)) if MAX_DEC_DIG == 21;
+  return fmtpy( q2s($nv)); # assuming that it's q2s() that will
+                           # handle the IEEE 754 long double correctly
+}
+
 sub n2s {
   my $arg = shift;
   my $ref = ref($arg);
@@ -76,16 +94,16 @@ sub n2s {
   return "$arg" if _SvIOK($arg);
   if(PV_NV_BUG && _SvPOK($arg)) {
     # perl might have set the POK flag when it should not
-    return ld2s($arg) if (_SvNOK($arg) && !_SvIOKp($arg));
+    return nv2s($arg) if (_SvNOK($arg) && !_SvIOKp($arg));
   }
-  return ld2s($arg) if _SvNOK($arg);
+  return nv2s($arg) if _SvNOK($arg);
   # $arg is neither integer nor float nor reference.
   # If the numified $arg fits into an IV, return the
   # stringification of that value.
-  # Else, return d2s($arg), which will coerce $arg
+  # Else, return nv2s($arg), which will coerce $arg
   # to an NV.
   return "$arg" if _SvIOK($arg + 0);
-  return ld2s($arg);
+  return nv2s($arg);
 }
 
 sub fmtpy {
@@ -162,12 +180,13 @@ sub _fmt {
     return $man;
   }
 
-  if($exp < 17) {
-    # Present scientific notation MANeEXP
+  if($exp < MAX_DEC_DIG) {
+    # Present scientific notation MANeEXP or
+    # VAL.0 when appropriate.
     # insert decimal point.
     #print "DEBUG: BLOCK 3 $man $exp\n";
     my $zero_pad = 0;
-    $zero_pad = $exp if $exp + $man_len < 17;
+    $zero_pad = $exp if $exp + $man_len < MAX_DEC_DIG;
     if($zero_pad > 0) {
      return $man . ('0' x $zero_pad) . '.0';
     }

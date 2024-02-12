@@ -5,6 +5,9 @@ use Math::Ryu qw(:all);
 
 use Test::More;
 
+if(Math::Ryu::_compiler_has_uint128()) { warn "Compiler HAS_UINT128_T: 1\n" }
+else { warn "Compiler HAS_UINT128: 0\n" }
+
 cmp_ok($Math::Ryu::VERSION, 'eq', '1.0', "\$Math::Ryu::VERSION is as expected");
 
 if($Config{nvsize} == 8) {

@@ -31,6 +31,7 @@ elsif($Config{nvtype} eq 'long double') {
   cmp_ok(fmtpy(nvtos(2 ** -16441)), 'eq', '6e-4950', "2** -16441 is 6e-4950");
   cmp_ok(fmtpy(nvtos(2 ** -16436)), 'eq', '1.866e-4948', "2** -16436 is 1.866e-4948");
   cmp_ok(fmtpy(nvtos(2 ** -16436 + 2 ** -16445)), 'eq', '1.87e-4948', "2** -16436 + 2 ** -16445 is 1.87e-4948");
+  cmp_ok(fmtpy(nvtos(0.0741598938131886598e21)), 'eq', '74159893813188659800.0', "0.0741598938131886598e21 is 74159893813188659800.0");
 }
 else {
   $type = 'Q';
@@ -41,7 +42,7 @@ unless($type eq 'L') {
   exit 0;
 }
 
-my $have_mpfr = 0;
+my $mpfr = 1;
 eval{require Math::MPFR;};
 if($@) {
   warn "Skipping remaining tests - Math::MPFR has failed to load\n";
@@ -63,13 +64,35 @@ if(Math::MPFR::MPFR_VERSION_MAJOR() < 3 || (Math::MPFR::MPFR_VERSION_MAJOR() == 
 
 for(1190 .. 1205, 590 .. 605,  90 .. 105, 0 .. 40) {
    my $mant = rand();
+   $mant = (split /e/i, "$mant")[0];
    my $exp = $_;
    $exp = "-$exp" if $_ % 3;
    my $n = $mant . 'e' . $exp;
    if(!ryu_lln($n)) {
      warn "Non-numeric: $mant $exp => $n\n";
    }
-   cmp_ok(fmtpy(ld2s($n)), 'eq', Math::MPFR::nvtoa($n), "$n renders ok");
+   cmp_ok(nv2s($n), 'eq', Math::MPFR::nvtoa($n), "$n renders ok");
+}
+
+cmp_ok(nv2s(0.0741598938131886598e21), 'eq', Math::MPFR::nvtoa(0.0741598938131886598e21), '0.0741598938131886598e21 renders correctly');
+
+if($mpfr) {
+  for my $iteration (1..10) {
+    my $sign = $iteration & 1 ? '-' : '';
+    for my $exp(0..50) {
+      $exp *= -1 if $iteration & 1;
+      my $rand =  $sign . rand() . "e$exp";
+      my $num = $rand + 0;
+      cmp_ok(nv2s($num), 'eq', Math::MPFR::nvtoa($num), "fmtpy() format agrees with nvtoa(): " . sprintf("%.17g", $num));
+    }
+  }
+
+  for my $num(0.1, 0.12, 0.123, 0.1234, 0.12345, 0.123456, 0.1234567, 0.12345678, 0.123456789, 0.1234567890, 0.12345678901, 0.123456789012,
+             0.1234567890123, 0.12345678901234, 0.123456789012345, 0.1234567890123456, 0.12345678901234567, 0.123456789012345678,
+             0.1234567890123456789, 0.12345678901234567894) {
+    cmp_ok(nv2s($num), 'eq', Math::MPFR::nvtoa($num), "fmtpy() format agrees with nvtoa(): " . sprintf("%.17g", $num));
+  }
+
 }
 
 done_testing();

@@ -12,6 +12,8 @@ s2d.c
 t/1_basic.t
 t/d2s.t
 t/mpfr_cross_checks.t
+t/round_trip.t
+have_uint128_t.in
 
 ryu_headers/common.h
 ryu_headers/d2fixed_full_table.h
@@ -49,7 +51,7 @@ Ryu_Library/ryu/s2f.c
 Ryu_Library/ryu/benchmark/benchmark.cc
 Ryu_Library/ryu/benchmark/benchmark_fixed.c
 Ryu_Library/ryu/benchmark/benchmark_fixed.cc
-BUILD
+Ryu_Library/ryu/benchmark/BUILD
 
 Ryu_Library/ryu/tests/BUILD
 Ryu_Library/ryu/tests/common_test.cc
