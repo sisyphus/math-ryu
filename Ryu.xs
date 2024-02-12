@@ -22,9 +22,20 @@
 #  include <quadmath.h>
 #endif
 
+#define QUAD_MANTISSA_BITS 112
+#define QUAD_EXPONENT_BITS 15
+
 #include "math_ryu_include.h"
 
 typedef struct floating_decimal_128 t_fd128;
+
+#ifdef COMPILER_HAS_UINT128_T
+struct floating_decimal_128 quad_to_fd128(NV d) {
+  uint128_t bits = 0;
+  memcpy(&bits, &d, sizeof(NV));
+  return generic_binary_to_decimal(bits, QUAD_MANTISSA_BITS, QUAD_EXPONENT_BITS, false);
+}
+#endif
 
 double M_RYU_s2d(char * buffer) {
 #if NVSIZE == 8
@@ -72,13 +83,13 @@ SV * q2s(pTHX_ SV * nv) {
   Newxz(buff, F128_BUF, char);
 
   if(buff == NULL) croak("Failed to allocate memory for string buffer in ld2s sub");
-  generic_to_chars(float128_to_fd128(SvNV(nv)), buff);
+  generic_to_chars(quad_to_fd128(SvNV(nv)), buff);
   outsv = newSVpv(buff, 0);
   Safefree(buff);
   return outsv;
 #else
   PERL_UNUSED_ARG(nv);
-  croak("q2s() is available only to perls whose NV is of type '__float128'");
+  croak("q2s() is available only to perls whose NV is full quad 128-bit");
 #endif
 }
 

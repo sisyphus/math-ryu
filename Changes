@@ -1,8 +1,9 @@
 1.0
      - Significant changes between 1.0 and 0.7 include removal of some fairly
-       useless functions, and support for -Duselongdouble builds of perl.
-       (I'll reinstate the removed functions, if requested.)
-       A debug version is no longer provided - also reinstateable on request.
+       useless functions (which can be reinstated, if requested), and support
+       for -Duselongdouble and -Dusequadmath builds of perl.
+       A debug version of this module is no longer provided - also reinstateable
+       on request.
 
 0.07
      - Workaround bugs in perls older than 5.30.0.

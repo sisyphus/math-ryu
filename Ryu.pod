@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Math::Ryu::L - perl interface to Ryu (NV-to-string conversion) for long doubles.
+Math::Ryu - perl interface to Ryu (NV-to-string conversion) for long doubles.
 
 =head1 DEPENDENCIES
 
@@ -18,7 +18,7 @@ Math::Ryu::L - perl interface to Ryu (NV-to-string conversion) for long doubles.
 
 =head1 SYNOPSIS
 
-   use Math::Ryu::L qw(:all);
+   use Math::Ryu  qw(:all);
 
 =head1 FUNCTIONS
 
@@ -50,10 +50,6 @@ Math::Ryu::L - perl interface to Ryu (NV-to-string conversion) for long doubles.
     The argument $s is a string as returned by d2(s) or n2s().
     We reformat this string to be the same as the string that
     python3 produces and return it as $str.
-
-=head1 TODO
-
-    Cover larger __float128 NV type.
 
 =head1 LICENSE
 

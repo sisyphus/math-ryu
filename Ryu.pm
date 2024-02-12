@@ -82,8 +82,7 @@ sub nv2s {
   my $nv = shift;
   return fmtpy( d2s($nv)) if MAX_DEC_DIG == 17;
   return fmtpy(ld2s($nv)) if MAX_DEC_DIG == 21;
-  return fmtpy( q2s($nv)); # assuming that it's q2s() that will
-                           # handle the IEEE 754 long double correctly
+  return fmtpy( q2s($nv));
 }
 
 sub n2s {

@@ -3,17 +3,6 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Cwd;
 
-if($Config::Config{nvtype} eq '__float128') {
-  print "  Math::Ryu is not yet usable with a \"__float128\" build of perl.\n";
-  exit 0;
-}
-
-if($Config::Config{nvsize} != 8 && $Config::Config{nvtype} eq 'long double'
-   && defined($Config::Config{longdblkind}) && $Config::Config{longdblkind} < 3) {
-  print "  Math::Ryu is not yet usable with an \"IEEE 754 long double\" build of perl.\n";
-  exit 0;
-}
-
 # We need to know whether the uint128_t type is available.
 my $defines = '';
 
