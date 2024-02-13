@@ -13,7 +13,7 @@
 #include <ryu.h>
 #include <ryu_parse.h>
 
-#ifdef COMPILER_HAS_UINT128_T
+#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128)
 #  include <generic_128.h>    /* modified to include stdbool.h */
 #  include <ryu_generic_128.h>
 #  include <stdbool.h>
@@ -29,7 +29,7 @@
 
 typedef struct floating_decimal_128 t_fd128;
 
-#ifdef COMPILER_HAS_UINT128_T
+#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128)
 struct floating_decimal_128 quad_to_fd128(NV d) {
   uint128_t bits = 0;
   memcpy(&bits, &d, sizeof(NV));

@@ -121,6 +121,10 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
           'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
 
    $nv = s2d($str); # string to double
+    BE WARNED !! This function might not handle infinity correctly.
+    Avoid it, especially if non-finite values might be necountered.
+    On perl-5.30.0 and later, perl will perform the task reliably,
+    so just use perl.
     Available only to perls whose $Config{nvsize} is 8. Converts the
     string ($str) to a floating point value ($nv) and returns it.
 

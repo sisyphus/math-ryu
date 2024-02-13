@@ -7,6 +7,12 @@ use Cwd;
 my $defines = '';
 
 my $mycc    = '';
+my $avoid_generic_128 = 0;
+$avoid_generic_128 = 1
+  if ($Config::Config{make} eq 'dmake' || $Config::Config{make} eq 'dmake');
+
+$defines .= ' -DAVOID_GENERIC_128'
+  if $avoid_generic_128;
 
 if(@ARGV) {
   for my $arg(@ARGV) {
@@ -44,7 +50,7 @@ $top_dir =~ s/\\/\//g;
 
 my $lib_loc = 'Ryu_Library/ryu';
 
-if($defines =~ /\-DCOMPILER/) {
+if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
   ## BUILD RYU LIBRARY ##
   if(chdir "./$lib_loc") {
     my $make = $Config::Config{make};
@@ -80,9 +86,10 @@ my %options = (
   },
 );
 
-if($defines !~ /\-DCOMPILER/) {
+if($defines !~ /\-DCOMPILER/ || $avoid_generic_128) {
   # Compile d2s.c, s2d.c and d2fixed.c
-  # NOTE: The current Ryu_Library/ryu/Makefile won't work with 'nmake'.
+  # NOTE: The current Ryu_Library/ryu/Makefile
+  #       won't work with 'nmake' and 'dmake'.
   $options{OBJECT} = '$(O_FILES)';
   #$ENV{INCLUDE} .= ";${top_dir}/${lib_loc};";
 }
