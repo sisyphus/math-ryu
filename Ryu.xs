@@ -17,7 +17,9 @@
 #  include <generic_128.h>    /* modified to include stdbool.h */
 #  include <ryu_generic_128.h>
 #  include <stdbool.h>
-#  include <quadmath.h>
+#  ifdef USE_QUADMATH
+#    include <quadmath.h> /* do we actually need this ? */
+#  endif
 #endif
 
 #define QUAD_MANTISSA_BITS 112
