@@ -49,7 +49,9 @@ if($defines =~ /\-DCOMPILER/) {
   if(chdir "./$lib_loc") {
     my $make = $Config::Config{make};
     my $cc = $Config::Config{cc};
-    system($make, "CC=$cc");
+    my @flags = ("CC=$cc");
+    push(@flags, "CFLAGS=-fPIC") if $Config::Config{cccdlflags} =~ /\-fPIC/;
+    system($make, @flags);
   }
 
   chdir $top_dir;
