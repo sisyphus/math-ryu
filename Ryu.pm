@@ -101,7 +101,10 @@ sub n2s {
   # stringification of that value.
   # Else, return nv2s($arg), which will coerce $arg
   # to an NV.
-  return "$arg" if _SvIOK($arg + 0);
+  if(_SvIOK($arg + 0)) {
+    my $ret = $arg + 0;
+    return "$ret";
+  }
   return nv2s($arg);
 }
 

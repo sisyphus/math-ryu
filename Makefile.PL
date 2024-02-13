@@ -31,12 +31,20 @@ else {
   $defines .= " -DCOMPILER_HAS_UINT128_T";
 }
 
+# In Ryu.pm we define the constant MAX_DEC_DIG.
+# Here (following the same procedure)  we set the XS symbol of the same name, to the same value.
+if($Config::Config{nvsize} == 8)               { $defines .= ' -DMAX_DEC_DIG=17' }
+elsif($Config::Config{nvtype} eq '__float128') { $defines .= ' -DMAX_DEC_DIG=36' }
+elsif(defined($Config::Config{longdblkind})
+      && $Config::Config{longdblkind} < 3)     { $defines .= ' -DMAX_DEC_DIG=36' }
+else                                           { $defines .= ' -DMAX_DEC_DIG=21' }
+
 my $top_dir = getcwd();
 $top_dir =~ s/\\/\//g;
 
 my $lib_loc = 'Ryu_Library/ryu';
 
-if($defines) {
+if($defines =~ /\-DCOMPILER/) {
   ## BUILD RYU LIBRARY ##
   if(chdir "./$lib_loc") {
     my $make = $Config::Config{make};
@@ -70,9 +78,9 @@ my %options = (
   },
 );
 
-if(!$defines) {
+if($defines !~ /\-DCOMPILER/) {
   # Compile d2s.c, s2d.c and d2fixed.c
-  # NOTE: The current ryu/Makefile won't work with 'nmake'.
+  # NOTE: The current Ryu_Library/ryu/Makefile won't work with 'nmake'.
   $options{OBJECT} = '$(O_FILES)';
   #$ENV{INCLUDE} .= ";${top_dir}/${lib_loc};";
 }

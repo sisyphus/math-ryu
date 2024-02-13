@@ -14,8 +14,6 @@
 #include <ryu_parse.h>
 
 #ifdef COMPILER_HAS_UINT128_T
-#  define __STDC_WANT_DEC_FP__ 1
-#  include <ryu.h>
 #  include <generic_128.h>    /* modified to include stdbool.h */
 #  include <ryu_generic_128.h>
 #  include <stdbool.h>
@@ -58,7 +56,7 @@ SV * M_RYU_d2s(pTHX_ SV * nv) {
 }
 
 SV * ld2s(pTHX_ SV * nv) {
-#ifdef USE_LONG_DOUBLE
+#if MAX_DEC_DIG == 21
   char * buff;
   SV * outsv;
 
@@ -71,16 +69,16 @@ SV * ld2s(pTHX_ SV * nv) {
   return outsv;
 #else
   PERL_UNUSED_ARG(nv);
-  croak("ld2s() is available only to perls whose NV is of type 'long double'");
+  croak("ld2s() is available only to perls whose NV is of type 80-bit extended precision 'long double'");
 #endif
 }
 
 SV * q2s(pTHX_ SV * nv) {
-#ifdef USE_QUADMATH
+#if MAX_DEC_DIG == 36
   char * buff;
   SV * outsv;
 
-  Newxz(buff, F128_BUF, char);
+   Newxz(buff, F128_BUF, char);
 
   if(buff == NULL) croak("Failed to allocate memory for string buffer in ld2s sub");
   generic_to_chars(quad_to_fd128(SvNV(nv)), buff);
@@ -89,7 +87,7 @@ SV * q2s(pTHX_ SV * nv) {
   return outsv;
 #else
   PERL_UNUSED_ARG(nv);
-  croak("q2s() is available only to perls whose NV is full quad 128-bit");
+  croak("q2s() is available only to perls whose NV is either '__float128' or IEEE 754 'long double'");
 #endif
 }
 
@@ -120,6 +118,14 @@ int ryu_lln(pTHX_ SV * sv) {
 int _compiler_has_uint128(void) {
 #ifdef COMPILER_HAS_UINT128_T
    return 1;
+#else
+   return 0;
+#endif
+}
+
+int _get_max_dec_dig(void) {
+#ifdef MAX_DEC_DIG
+   return MAX_DEC_DIG;
 #else
    return 0;
 #endif
@@ -179,3 +185,6 @@ OUTPUT:  RETVAL
 
 int
 _compiler_has_uint128 ()
+
+int
+_get_max_dec_dig ()

@@ -8,7 +8,7 @@ use Test::More;
 if(Math::Ryu::MAX_DEC_DIG == 17) {
 
   if(!(2 ** -1075)) {
-    cmp_ok(nv2s(2 ** -1075), '==', 0, "Weird (and wrong): 2 ** -1075 is zero on this system");
+    cmp_ok(nv2s(2 ** -1075), '==', 0, "2 ** -1075 is zero on this system");
   }
   else {
     warn "Skipping rendition of 2**-1075 because this dumbarse perl thinks it's non-zero\n";
@@ -56,6 +56,10 @@ if(Math::MPFR::MPFR_VERSION_MAJOR() < 3 || (Math::MPFR::MPFR_VERSION_MAJOR() == 
   exit 0;
 }
 
+my $obj = Math::MPFR->new();
+Math::MPFR::Rmpfr_set_inf($obj, 1);
+my $inf = Math::MPFR::Rmpfr_get_NV($obj, 0);
+
 for(1190 .. 1205, 590 .. 605,  90 .. 105, 0 .. 40) {
    my $mant = rand();
    $mant = (split /e/i, "$mant")[0];
@@ -65,7 +69,13 @@ for(1190 .. 1205, 590 .. 605,  90 .. 105, 0 .. 40) {
    if(!ryu_lln($n)) {
      warn "Non-numeric: $mant $exp => $n\n";
    }
-   cmp_ok(nv2s($n), 'eq', Math::MPFR::nvtoa($n), "$n renders ok");
+   if(nv2s($n) + 0 == $inf) {
+     # Avoid getting bogged down in differences between representation of infinity.
+     cmp_ok(nv2s($n) + 0, '==', Math::MPFR::nvtoa($n) + 0, "Inf == inf");
+   }
+   else {
+     cmp_ok(nv2s($n), 'eq', Math::MPFR::nvtoa($n), "$n renders ok");
+   }
 }
 
 cmp_ok(nv2s(0.0741598938131886598e21), 'eq', Math::MPFR::nvtoa(0.0741598938131886598e21), '0.0741598938131886598e21 renders correctly');
