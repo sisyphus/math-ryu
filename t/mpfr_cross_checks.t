@@ -83,8 +83,9 @@ cmp_ok(nv2s(0.0741598938131886598e21), 'eq', Math::MPFR::nvtoa(0.074159893813188
 if($mpfr) {
   for my $iteration (1..10) {
     my $sign = $iteration & 1 ? '-' : '';
-    for my $exp(0..50) {
-      $exp *= -1 if $iteration & 1;
+    for my $p(0..50) {
+      my $exp = $p;
+      $exp = "-$exp" if $iteration & 1;
       my $rand =  $sign . rand() . "e$exp";
       my $num = $rand + 0;
       cmp_ok(nv2s($num), 'eq', Math::MPFR::nvtoa($num), "fmtpy() format agrees with nvtoa(): " . sprintf("%.17g", $num));
