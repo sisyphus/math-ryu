@@ -60,7 +60,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
