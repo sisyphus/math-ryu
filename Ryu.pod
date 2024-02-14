@@ -56,10 +56,10 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
 =head1 SYNOPSIS
 
    For this synopsis, we use nv2s() which first appears in version
-   1.0 of Math::Ryu. From then, it's the usual "goto" function to use.
-   Some (hardly useful) functions from the earlier versions have been
-   removed as of version 1.0. See the "FUNCTIONS" documentation below
-   for a full list of current functions.
+   1.0 of Math::Ryu. From version 1.0 on, nv2s() is the usual "goto"
+   function. Some (not-very-useful) functions from the earlier versions
+   have been removed as of version 1.0. See the "FUNCTIONS" documentation
+   below for a full list of current public functions.
 
    use Math::Ryu qw(:all);
 
@@ -81,10 +81,16 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    $str = nv2s($nv);
     $nv holds a perl floating point numeric value (NV). $str is a string in
     floating point format, that accurately and succinctly represents the
-    value held by $nv. $str, when correctly assigned back to a perl number,
-    will always be equivalent to $nv. Also, $str will contain as few digits
-    as possible, without compromising that accuracy.
-    Arguments that are not an NV will be coerced to NV.
+    value held by $nv. When $str is correctly assigned to a perl number,
+    that nnumber will be equivalent to $nv. Also, $str will contain as few
+    digits as possible, without compromising that accuracy.
+    $str is formatted by fmtpy() - documented below. (The format is the
+    same as provided by Python3's print() function for the same value.)
+    There is no need for the caller to know the type of NV (nvtype) that
+    $nv is - the nv2s() function handles that.
+    Arguments that are references will be rejected, causing the script to
+    die with an explanatory message. Other arguments that are not an NV
+    will be coerced to NV, following the usual rules that perl employs.
 
    $str = n2s($sv);
     Handles "integer", "floating point" and "string" values. If the
@@ -108,7 +114,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    '1.4142135623730950488E0' (for square root of 2).
 
   $str = q2s($nv);  # Use only when $Config{nvtype} is either
-                    # '__float128' orIEEE 754 'long double'.
+                    # '__float128' or IEEE 754 'long double'.
     Returns a decimal string representation of the value of $nv
     in the format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
     '1.4142135623730950488016887242096982E0' (for square root of 2).
@@ -120,13 +126,20 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     NOTE: Doing 'fmtpy(d2s($nv))' or 'fmtpy(ld2s($nv))' or
           'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
 
+   $bool = ryu_lln($sv);
+    This is an interface to the API function 'looks_like_number'.
+    Returns 1 if $sv looks like a number, else returns 0.
+    There's not really any reason to include this subroutine, but
+    it's there to use if it's ever helpful.
+
    $nv = s2d($str); # string to double
-    BE WARNED !! This function might not handle infinity correctly.
-    Avoid it, especially if non-finite values might be necountered.
+    BE WARNED: This function generally mishandles inf and nan !!
+    AVOID USING IT if non-finite values might be encountered !!!
     On perl-5.30.0 and later, perl will perform the task reliably,
     so just use perl.
     Available only to perls whose $Config{nvsize} is 8. Converts the
-    string ($str) to a floating point value ($nv) and returns it.
+    string ($str) to a double precision floating point value ($nv)
+    and returns it.
 
 =head1 LICENSE
 

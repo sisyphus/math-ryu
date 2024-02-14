@@ -23,7 +23,7 @@ if(Math::Ryu::MAX_DEC_DIG == 17) {
   my $skip = 0;
   $skip =  1 if s2d(d2s($inf)) != $inf;
   if($skip) {
-  warn "\n   Be warned: s2d() does not handle inf correctly !!\n",
+  warn "\n   Be warned: s2d() does not handle inf or nan correctly !!\n",
         "   DO NOT USE IT if non-finite values might be encountered\n";
   }
 
