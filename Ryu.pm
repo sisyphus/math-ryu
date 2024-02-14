@@ -66,6 +66,7 @@ DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
   d2s ld2s q2s nv2s
+  pn pnv sn snv
   n2s
   s2d
   fmtpy
@@ -75,6 +76,9 @@ my @tagged = qw(
 @Math::Ryu::EXPORT = ();
 @Math::Ryu::EXPORT_OK = @tagged;
 %Math::Ryu::EXPORT_TAGS = (all => \@tagged);
+
+my $double_inf = 2 ** 1500;
+my $double_nan = $double_inf / $double_inf;
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -203,6 +207,36 @@ sub _fmt {
 
   #print "DEBUG: BLOCK 5\n";
   return $man . 'e+' . $exp;
+}
+
+sub s2d {
+  die "s2d() is available only to perls whose NV is of type 'double'"
+    unless MAX_DEC_DIG == 17;
+  my $str = shift;
+  return $double_inf  if $str =~ /^(\s+|\+)?inf/i;
+  return -$double_inf if $str =~ /^(\s+)?\-inf/i;
+  return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+  return _s2d($str);
+}
+
+sub pn {
+  my $arg = shift;
+  print n2s($arg);
+}
+
+sub sn {
+  my $arg = shift;
+  print n2s($arg), "\n";
+}
+
+sub pnv {
+  my $nv = shift;
+  print nv2s($nv);
+}
+
+sub snv {
+  my $nv = shift;
+  print nv2s($nv), "\n";
 }
 
 1;

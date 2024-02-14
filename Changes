@@ -1,4 +1,6 @@
 1.01
+     - Fix s2d() to handle Inf and NaN.
+     - Add new functions pn, pnv, sn, snv.
 
 1.0
      - Significant changes between 1.0 and 0.7 include removal of some fairly
