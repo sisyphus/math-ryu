@@ -5,6 +5,18 @@ use Config;
 
 use Test::More;
 
+my $skip = 0;
+
+if(Math::Ryu::MAX_DEC_DIG == 21) {
+  if(2 ** -16445 == 0) {
+    warn "  Seems that this long double build of perl has no powl() function.\n",
+         "  Skipping tests that don't work around this bug - but a rewritten ",
+         "  script that provides such a workaround would be gladly received\n";
+    $skip = 1;
+  }
+}
+
+
 if(Math::Ryu::MAX_DEC_DIG == 17) {
 
   if(!(2 ** -1075)) {
@@ -20,14 +32,16 @@ if(Math::Ryu::MAX_DEC_DIG == 17) {
 }
 elsif(Math::Ryu::MAX_DEC_DIG == 21) {
   cmp_ok(nv2s(2 ** -16446), '==', 0, "2 ** -16446 is zero");
-  cmp_ok(nv2s(2 ** -16445), 'eq', '4e-4951', "2 ** -16445 is 4e-4951");
-  cmp_ok(nv2s(2 ** -16444), 'eq', '7e-4951', "2 ** -16444 is 7e-4951");
-  cmp_ok(nv2s(2 ** -16443), 'eq', '1.5e-4950', "2 ** -16443 is 1.5e-4950");
-  cmp_ok(nv2s(2 ** -16442), 'eq', '3e-4950', "2 ** -16442 is 3e-4950");
-  cmp_ok(nv2s(2 ** -16441), 'eq', '6e-4950', "2 ** -16441 is 6e-4950");
-  cmp_ok(nv2s(2 ** -16436), 'eq', '1.866e-4948', "2 ** -16436 is 1.866e-4948");
-  cmp_ok(nv2s(2 ** -16436 + 2 ** -16445), 'eq', '1.87e-4948', "2** -16436 + 2 ** -16445 is 1.87e-4948");
-  cmp_ok(nv2s(0.0741598938131886598e21), 'eq', '74159893813188659800.0', "0.0741598938131886598e21 is 74159893813188659800.0");
+  unless($skip) {
+    cmp_ok(nv2s(2 ** -16445), 'eq', '4e-4951', "2 ** -16445 is 4e-4951");
+    cmp_ok(nv2s(2 ** -16444), 'eq', '7e-4951', "2 ** -16444 is 7e-4951");
+    cmp_ok(nv2s(2 ** -16443), 'eq', '1.5e-4950', "2 ** -16443 is 1.5e-4950");
+    cmp_ok(nv2s(2 ** -16442), 'eq', '3e-4950', "2 ** -16442 is 3e-4950");
+    cmp_ok(nv2s(2 ** -16441), 'eq', '6e-4950', "2 ** -16441 is 6e-4950");
+    cmp_ok(nv2s(2 ** -16436), 'eq', '1.866e-4948', "2 ** -16436 is 1.866e-4948");
+    cmp_ok(nv2s(2 ** -16436 + 2 ** -16445), 'eq', '1.87e-4948', "2** -16436 + 2 ** -16445 is 1.87e-4948");
+    cmp_ok(nv2s(0.0741598938131886598e21), 'eq', '74159893813188659800.0', "0.0741598938131886598e21 is 74159893813188659800.0");
+  }
 }
 else {
   # Math::Ryu::MAX_DEC_DIG == 36
@@ -45,7 +59,7 @@ if($@) {
 }
 
 if($Math::MPFR::VERSION < 4.14) {
-  warn "Skipping remaining tests - Math::MPFR needs to be at least 4.14\n";
+  warn "Skipping remaining tests - Math::MPFR needs to be at version 4.14 or later\n";
   done_testing();
   exit 0;
 }
@@ -86,7 +100,8 @@ if($mpfr) {
     for my $p(0..50) {
       my $exp = $p;
       $exp = "-$exp" if $iteration & 1;
-      my $rand =  $sign . rand() . "e$exp";
+      my $rand =  $sign . rand();
+      $rand .= "e$exp" unless $rand =~ /e/i;
       my $num = $rand + 0;
       cmp_ok(nv2s($num), 'eq', Math::MPFR::nvtoa($num), "fmtpy() format agrees with nvtoa(): " . sprintf("%.17g", $num));
     }
