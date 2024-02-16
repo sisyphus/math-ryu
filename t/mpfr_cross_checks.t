@@ -7,9 +7,18 @@ use Test::More;
 
 my $skip = 0;
 
+if(Math::Ryu::MAX_DEC_DIG == 17) {
+  if(2 ** -1074 == 0) {
+    warn "  Seems that this \"double\" build of perl sets subnormals to 0.\n",
+         "  Skipping tests that don't work around this bug - but a rewritten ",
+         "  script that provides such a workaround would be gladly received\n";
+    $skip = 1;
+  }
+}
+
 if(Math::Ryu::MAX_DEC_DIG == 21) {
   if(2 ** -16445 == 0) {
-    warn "  Seems that this long double build of perl has no powl() function.\n",
+    warn "  Seems that this \"long double\" build of perl has no powl() function.\n",
          "  Skipping tests that don't work around this bug - but a rewritten ",
          "  script that provides such a workaround would be gladly received\n";
     $skip = 1;
@@ -25,9 +34,11 @@ if(Math::Ryu::MAX_DEC_DIG == 17) {
   else {
     warn "Skipping rendition of 2**-1075 because this dumbarse perl thinks it's non-zero\n";
   }
-  cmp_ok(nv2s(2 ** -1074), 'eq', '5e-324', "2 ** -1074 is 5e-324");
-  cmp_ok(nv2s(2 ** -1064), 'eq', '5.06e-321', "2 ** -1064 is 5.06e-321");
-  cmp_ok(nv2s(2 ** -1064 + 2 ** -1074), 'eq', '5.064e-321', "2 ** -1064 + 2 ** -1074 is 5.064e-321");
+  unless($skip) {
+    cmp_ok(nv2s(2 ** -1074), 'eq', '5e-324', "2 ** -1074 is 5e-324");
+    cmp_ok(nv2s(2 ** -1064), 'eq', '5.06e-321', "2 ** -1064 is 5.06e-321");
+    cmp_ok(nv2s(2 ** -1064 + 2 ** -1074), 'eq', '5.064e-321', "2 ** -1064 + 2 ** -1074 is 5.064e-321");
+  }
 
 }
 elsif(Math::Ryu::MAX_DEC_DIG == 21) {
@@ -92,7 +103,7 @@ for(1190 .. 1205, 590 .. 605,  90 .. 105, 0 .. 40) {
    }
 }
 
-cmp_ok(nv2s(0.0741598938131886598e21), 'eq', Math::MPFR::nvtoa(0.0741598938131886598e21), '0.0741598938131886598e21 renders correctly');
+cmp_ok(nv2s(0.0741598938131886598e21), 'eq', Math::MPFR::nvtoa(0.0741598938131886598e21), '0.0741598938131886598e21 renders consistently');
 
 if($mpfr) {
   for my $iteration (1..10) {
