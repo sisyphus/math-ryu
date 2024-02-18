@@ -1,3 +1,5 @@
+1.02
+
 1.01
      - Fix s2d() to handle Inf and NaN.
      - Add new functions pn, pnv, sn, snv.
