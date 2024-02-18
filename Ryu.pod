@@ -92,6 +92,15 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     die with an explanatory message. Other arguments that are not an NV
     will be coerced to NV, following the usual rules that perl employs.
 
+    Note: nv2s() spends some time reformatting the string that the ryu
+          library returned. If you are happy enough with that original
+          string, then save some time by avoiding the reformating and
+          just run d2s() or ld2s() or q2s() - whichever is appropriate
+          for your nvtype. (Or employ your own reformatting sub.)
+          Run the script in the "benchmark" folder of Math-Ryu source
+          distro (perl benchmark.p), for comparative timings of "with"
+          and "without" reformatting.
+
    $str = n2s($sv);
     Handles "integer", "floating point" and "string" values. If the
     argument is a floating point numeric value, then this function returns

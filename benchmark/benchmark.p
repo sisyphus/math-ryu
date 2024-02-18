@@ -1,8 +1,20 @@
+# Timings for ryu (both reformatted and not reformatted),
+# perl's sprintf() and, if available, Math::MPFR's nvtoa().
+# Note that Math::Ryu::nv2s() and Math::MPFR::nvtoa() should
+# return identical strings for the same input argument.
+
 use warnings;
 use Benchmark;
 
 use Math::Ryu qw(:all);
 use Math::MPFR qw(:mpfr);
+
+if   (Math::Ryu::MAX_DEC_DIG == 17) { *NVtos =\&d2s  }
+elsif(Math::Ryu::MAX_DEC_DIG == 21) { *NVtos =\&ld2s }
+elsif(Math::Ryu::MAX_DEC_DIG == 36) { *NVtos =\&q2s  }
+else                                { die "Something seriously wrong here" }
+
+my $fmt = Math::Ryu::MAX_DEC_DIG;
 
 @nums = ();
 
@@ -35,10 +47,12 @@ for(1..100000) {
    push @nums, $num;
 }
 
-print scalar @nums, "\n";
-print $nums[123000], "\n";
+
+print "sprintf() performs \"%.${fmt}g\" formatting of the given values.\n";
 timethese (1, {
- 'ryu'  => '$r = nv2s ($_) for @nums;',
+ 'ryu_fmt'    => '$r = nv2s ($_) for @nums;',
+ 'ryu_unfmt'  => '$r = NVtos($_) for @nums;',
+ 'sprintf'    => '$r = sprintf("%.${fmt}g", $_) for @nums;',
 });
 
 $mpfr = 1;
@@ -52,6 +66,6 @@ elsif(Math::MPFR::MPFR_VERSION_MAJOR() < 3 ||
 
 if($mpfr) {
   timethese (1, {
-   'mpfr' => '$r = nvtoa($_) for @nums;',
+   'mpfr_fmt' => '$r = nvtoa($_) for @nums;',
   });
 }

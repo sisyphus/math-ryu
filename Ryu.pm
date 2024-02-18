@@ -113,100 +113,46 @@ sub n2s {
 }
 
 sub fmtpy {
-  # Format the string returned by ld2s according to the way
-  # that python3 does it.
-
-  my $sinput = shift;
-  return $sinput unless $sinput =~ /E|N/i;
-
-  if($sinput =~ /inf|nan/i) {
-    $sinput =~ s/inity?//i;
-    return lc($sinput);
-  }
-  if($sinput =~ /^\-?0E0$/) {
-    $sinput =~ s/E/./;
-    return $sinput;
-  }
-
-  my ($man, $exp) = split /E/i, $sinput;
-
+  my $s = shift;
   my $sign = '';
-  # Remove the leading '-' and reinstate it later.
-  $sign = '-' if $man =~ s/^\-//;
+  my $bitpos = 0;
 
-  return $sign . _fmt($man, $exp);
-}
+  $sign = '-' if $s =~ s/^\-//;
+  return $sign . lc(substr($s, 0, 3)) if $s =~ /n/i;
 
-sub _fmt {
+  $bitpos = 1 if substr($s, 1, 1) eq '.'; # else there isn't a radix point. (Depends on locale ?)
 
-  my ($man, $exp, $ret) = (shift, shift, 0);
-  return $man if !$exp;
-
-  # Note that $man, as called by fmtjs() and fmtpy()
-  # has no leading '-' or '+' sign.
-
-  if($man =~ /\./) {
-    my @parts = split /\./, $man;
-    $exp -= length($parts[1]);
-    $man = $parts[0] . $parts[1]
-  }
-
-  # $man is now an integer and "${man}e${exp}" represents
-  # the absolute value of the original string.
-
-  #my $critical = $exp; # Formatting is based around the value of $exp;
-  my $man_len = length($man);
-
-  if($exp < -3) {
-    #print "DEBUG: BLOCK 1 $man $exp\n";
-    my $leading_zeros = $man_len + $exp;
-    if($leading_zeros <= 0 && $leading_zeros >= -3) {
-      return '0.' . ('0' x abs($leading_zeros)) . $man;
+  if($bitpos) {
+    return $sign . $s if $s =~ s/E0$//;
+    my @parts = split /E/i, $s;
+    if($parts[1] > 0 && $parts[1] < MAX_DEC_DIG) {
+      my $zero_pad = $parts[1] - (length($parts[0]) - 2);
+      if($zero_pad >= 0 && ($zero_pad + length($parts[0])) < MAX_DEC_DIG + 1 ) {
+        substr($parts[0], 1, 1, '');
+        return $sign . $parts[0] . ('0' x $zero_pad) . '.0';
+      }
+      elsif($zero_pad < 0) {
+        # relocate the decimal point
+        substr($parts[0], 1, 1, '');
+        substr($parts[0], $zero_pad, 0, '.');
+        return $sign . $parts[0];
+      }
     }
-
-    # Present scientific notation MANeEXP
-    if(abs($exp) < $man_len - 1) {
-      substr($man, $exp, 0, '.');
-      return $man;
+    $s =~ s/e/e\+/i if $parts[1] > 0;
+    if ($parts[1] < -4 || $parts[1] > 0) {
+      substr($s, -1, 0, '0') if substr($s, -2, 1) eq '-';
+      return $sign . lc($s);
     }
-    elsif($man_len > 1) {
-      # insert decimal point
-      substr($man, 1, 0, '.');
-      $exp += $man_len - 1;
-    }
-    return $man . sprintf "e%03d", $exp;
+    substr($parts[0], 1, 1, ''); # remove decimal point.
+    return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
   }
-
-  if($exp <= 0) {
-    # Show no exponent - just M
-    #print "DEBUG: BLOCK 2 $man $exp\n";
-    if(!$exp) {$man .= '.0'}
-    else {substr($man, $exp, 0, '.')}
-    $man =~ s/^\./0./;
-    return $man;
+  else {
+    return $sign . $s . '.0' if $s =~ s/E0$//;
+    my @parts = split /E/i, $s;
+    $s =~ s/e/e\+/i if $parts[1] > 0;
+    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > 0);
+    return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
   }
-
-  if($exp < MAX_DEC_DIG) {
-    # Present scientific notation MANeEXP or
-    # VAL.0 when appropriate.
-    # insert decimal point.
-    #print "DEBUG: BLOCK 3 $man $exp\n";
-    my $zero_pad = 0;
-    $zero_pad = $exp if $exp + $man_len < MAX_DEC_DIG;
-    if($zero_pad > 0) {
-     return $man . ('0' x $zero_pad) . '.0';
-    }
-    $exp += $man_len - 1;
-    substr($man, 1, 0, '.');
-  }
-  elsif($man_len != 1) {
-    $exp += $man_len - 1;
-    substr($man, 1, 0, '.');
-    #print "DEBUG: BLOCK 4\n";
-  }
-
-  #print "DEBUG: BLOCK 5\n";
-  return $man . 'e+' . $exp;
 }
 
 sub s2d {

@@ -30,4 +30,6 @@ else {
   cmp_ok($s, 'eq', '0.13999999999999999999999999999999999', "fmtpy(q2s(1.4 / 10)) is as expected");
 }
 
+cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
+
 done_testing();
