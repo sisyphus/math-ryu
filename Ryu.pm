@@ -113,44 +113,70 @@ sub n2s {
 }
 
 sub fmtpy {
+  # The given argument will be either 'Infinity', '-Infinity', 'NaN'
+  # or a finite value of the form "mantissaEexponent".
+  # The mantissa portion will include a decimal point (with that decimal
+  # point being the second character in the mantissa) unless the
+  # mantissa consists of only one decimal significant decimal digit,
+  # in which case there is no decimal point and the mantissa consists
+  # solely of that digit.
+
   my $s = shift;
   my $sign = '';
   my $bitpos = 0;
 
   $sign = '-' if $s =~ s/^\-//;
-  return $sign . lc(substr($s, 0, 3)) if $s =~ /n/i;
 
-  $bitpos = 1 if substr($s, 1, 1) eq '.'; # else there isn't a radix point. (Depends on locale ?)
+  $bitpos = 1 if substr($s, 1, 1) eq '.'; # else there isn't a decimal point.
 
   if($bitpos) {
-    return $sign . $s if $s =~ s/E0$//;
+    # Mantissa's second character is the decimal point.
+    # Split into mantissa and exponent
     my @parts = split /E/i, $s;
     if($parts[1] > 0 && $parts[1] < MAX_DEC_DIG) {
+      # We want, eg,  a value like 1.1E-3 to be returned as "0.0011".
       my $zero_pad = $parts[1] - (length($parts[0]) - 2);
       if($zero_pad >= 0 && ($zero_pad + length($parts[0])) < MAX_DEC_DIG + 1 ) {
         substr($parts[0], 1, 1, '');
         return $sign . $parts[0] . ('0' x $zero_pad) . '.0';
       }
       elsif($zero_pad < 0) {
+        # We want, eg,  a value like 1.23625E2 to be returned as "123.625".
         # relocate the decimal point
         substr($parts[0], 1, 1, '');
         substr($parts[0], $zero_pad, 0, '.');
         return $sign . $parts[0];
       }
     }
+
+    # Return as is, except that we replace the 'E' with 'e', ensuring also
+    # that the exponent is preceded by a '+' or '-' sign, and that
+    # negative exponents consist of at least 2 digits.
     $s =~ s/e/e\+/i if $parts[1] > 0;
-    if ($parts[1] < -4 || $parts[1] > 0) {
-      substr($s, -1, 0, '0') if substr($s, -2, 1) eq '-';
+    if ($parts[1] < -4 || $parts[1] >= 0) {
+      $s =~ s/E0$//i;
+      substr($s, -1, 0, '0') if substr($s, -2, 1) eq '-'; # pad exponent with a leading '0'.
       return $sign . lc($s);
     }
+    # Return, eg 6.25E1 as "0.625"
     substr($parts[0], 1, 1, ''); # remove decimal point.
     return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
   }
   else {
-    return $sign . $s . '.0' if $s =~ s/E0$//;
+    # Return '-inf', 'inf', or 'nan' if (and as) appropriate.
+    return $sign . lc(substr($s, 0, 3)) if $s =~ /n/i;
+
+    # Append '.0' to the mantissa and return it if the exponent is 0.
+    return $sign . $s . '.0' if $s =~ s/E0$//i;
     my @parts = split /E/i, $s;
+
+    # Return as is, except that we replace the 'E' with 'e', ensuring also
+    # that the exponent is preceded by a '+' or '-' sign, and that
+    # negative exponents consist of at least 2 digits.
     $s =~ s/e/e\+/i if $parts[1] > 0;
     return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > 0);
+
+    # Return, eg, 6E-3 as "0.006".
     return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
   }
 }
