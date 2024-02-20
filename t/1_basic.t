@@ -32,4 +32,25 @@ else {
 
 cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
 
+cmp_ok(nv2s(6e-7),  'eq',  '6e-07',  "Me-0P ok");
+cmp_ok(nv2s(-6e-7), 'eq', '-6e-07', "-Me-0P ok");
+cmp_ok(nv2s(6e-117),  'eq',  '6e-117',  "Me-PPP ok");
+cmp_ok(nv2s(-6e-117), 'eq', '-6e-117', "-Me-PPP ok");
+cmp_ok(nv2s(6e40),  'eq',  '6e+40',  "Me+PP ok");
+cmp_ok(nv2s(-6e40), 'eq', '-6e+40', "-Me+PP ok");
+cmp_ok(nv2s(6e9),   'eq',  '6000000000.0',  "Me+P ok");
+cmp_ok(nv2s(-6e9),  'eq', '-6000000000.0', "-Me+P ok");
+
+my $nvprec = Math::Ryu::NVPREC;
+my $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+cmp_ok(nv2s($nv),  'eq', '6' . ('0' x $nvprec) . '.0', "Me+NVPREC ok");
+cmp_ok(nv2s(-$nv),  'eq', '-6' . ('0' x $nvprec) . '.0', "-Me+NVPREC ok");
+
+$nvprec++;
+$nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+cmp_ok(nv2s($nv),  'eq', '6e+' . "$nvprec", "Me+(NVPREC + 1)  ok");
+cmp_ok(nv2s(-$nv),  'eq', '-6e+' . "$nvprec", "-Me+(NVPREC + 1)  ok");
+
+
+
 done_testing();

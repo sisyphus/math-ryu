@@ -55,6 +55,8 @@ BEGIN {
 use constant PV_NV_BUG   => $Math::Ryu::PV_NV_BUG;
 use constant IVSIZE      => $Config{ivsize};
 use constant MAX_DEC_DIG => $::max_dig; # set in second BEGIN{} block
+use constant NVPREC      => MAX_DEC_DIG == 17 ? 15 :
+                                           MAX_DEC_DIG == 21 ? 18 : 33;
 
 require Exporter;
 *import = \&Exporter::import;
@@ -174,7 +176,12 @@ sub fmtpy {
     # that the exponent is preceded by a '+' or '-' sign, and that
     # negative exponents consist of at least 2 digits.
     $s =~ s/e/e\+/i if $parts[1] > 0;
-    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > 0);
+    $s =~ s/e\-/e\-0/i if ($parts[1] < -4 && $parts[1] > -10);
+    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > NVPREC);
+
+    if($parts[1] >= 0 ) { # $parts[1] is in the range 1..NVPREC
+      return $sign . $parts[0] . (0 x $parts[1]) . '.0';
+    }
 
     # Return, eg, 6E-3 as "0.006".
     return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
