@@ -71,7 +71,7 @@ my @tagged = qw(
   pn pnv sn snv
   n2s
   s2d
-  fmtpy
+  fmtpy fmtpy_pp
   ryu_lln
   );
 
@@ -114,7 +114,7 @@ sub n2s {
   return nv2s($arg);
 }
 
-sub fmtpy {
+sub fmtpy_pp {
   # The given argument will be either 'Infinity', '-Infinity', 'NaN'
   # or a finite value of the form "mantissaEexponent".
   # The mantissa portion will include a decimal point (with that decimal
