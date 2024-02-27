@@ -6,17 +6,14 @@
 #if MAX_DEC_DIG == 17
 #  define MAN_BUF  D_BUF
 #  define EXP_BUF  8
-#  define NVPREC   15
 
 #elif MAX_DEC_DIG == 21
 #  define MAN_BUF  LD_BUF
 #  define EXP_BUF  12
-#  define NVPREC   18
 
 #else
 #  define MAN_BUF  F128_BUF
 #  define EXP_BUF  12
-#  define NVPREC   33
 #endif
 
 #define SIS_PERL_VERSION PERL_REVISION*1000000+PERL_VERSION*1000+PERL_SUBVERSION

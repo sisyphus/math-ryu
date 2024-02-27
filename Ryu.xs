@@ -145,6 +145,9 @@ SV * fmtpy(pTHX_ SV * in) {
     s++;
   }
 
+  /* If the given argument contains a decimal point, then that *
+   * decimal point will immediately follow the first digit.    *
+   * Otherwise, the argument does not contain a decimal point. */
   if(s[1] == '.') pointpos = 1;
 
   if(pointpos) {
@@ -174,7 +177,7 @@ SV * fmtpy(pTHX_ SV * in) {
       len = strlen(s);
       zero_pad = exponent - (len - 2);
       if(zero_pad >= 0 && (zero_pad + len < MAX_DEC_DIG + 1)) {
-        /* we want eg '1.23E15' to become '1230000000000000.0' */
+        /* Return, eg, '1.23E15' as '1230000000000000.0' */
         if(is_neg) man_str[0] = '-';
         man_str[0 + is_neg] = s[0];
         for(i = 2; i < len; i++) {
@@ -191,29 +194,24 @@ SV * fmtpy(pTHX_ SV * in) {
         outsv = newSVpv(man_str, 0);
         Safefree(man_str);
         Safefree(exp_str);
+        if(is_neg) s--;
         return outsv;
       }
       else if(zero_pad < 0) {
         /* We want, eg,  1.23625E2 to be returned as "123.625". *
          * This involves relocation of the decimal point.       */
         len = strlen(s);
-        seen = 0; /* set to 1 when the decimal point is encountered */
         zero_pad--;
         if(is_neg) man_str[0] = '-';
-        for(i = 0; i < len; i++) {
-          if(i == zero_pad + len) {
-            seen --;
-            man_str[i + is_neg] = '.';
-          }
-          else if(!seen && s[i] == '.') {
-            seen = 1;
-            i--;
-            continue;
-          }
-          else {
-            if(s[i + seen] == '\0') croak("BAD STUFF\n");
-            man_str[i + is_neg] = s[i + seen];
-          }
+        man_str[0 + is_neg] = s[0];
+        man_str[1 + is_neg] = s[2]; /* s[1] is the decimal point */
+        dec = 1; /* set to 0 when the decimal point is encountered */
+        for(i = 2; i < len; i++) {
+           if(i == zero_pad + len) {
+             man_str[i + is_neg] = '.';
+             dec--;
+           }
+           else man_str[i + is_neg] = s[i + dec];
         }
 
         man_str[i + is_neg] = '\0';
@@ -221,9 +219,11 @@ SV * fmtpy(pTHX_ SV * in) {
         outsv = newSVpv(man_str, 0);
         Safefree(man_str);
         Safefree(exp_str);
+        if(is_neg) s--;
         return outsv;
       }
     }
+
     len = strlen(s); /* now different to when initially set     *
                       * because 'E' has been replaced with '\0' */
     if(exponent < -4 || exponent >= 0) {
@@ -234,6 +234,7 @@ SV * fmtpy(pTHX_ SV * in) {
         outsv = newSVpv(man_str, 0);
         Safefree(man_str);
         Safefree(exp_str);
+        if(is_neg) s--;
         return outsv;
       }
       man_str[i + is_neg] = 'e';
@@ -246,6 +247,7 @@ SV * fmtpy(pTHX_ SV * in) {
         outsv = newSVpv(man_str, 0);
         Safefree(man_str);
         Safefree(exp_str);
+        if(is_neg) s--;
         return outsv;
       }
       /* exponent < -4 */
@@ -263,6 +265,7 @@ SV * fmtpy(pTHX_ SV * in) {
       outsv = newSVpv(man_str, 0);
       Safefree(man_str);
       Safefree(exp_str);
+      if(is_neg) s--;
       return outsv;
     }
     /* exponent is in range -1 to -4 (inclusive). *
@@ -281,6 +284,7 @@ SV * fmtpy(pTHX_ SV * in) {
      outsv = newSVpv(man_str, 0);
      Safefree(man_str);
      Safefree(exp_str);
+     if(is_neg) s--;
      return outsv;
   }
   else {
@@ -298,11 +302,12 @@ SV * fmtpy(pTHX_ SV * in) {
     }
     /* mantissa is single-digit */
     len = strlen(s);
-    Newxz(exp_str, NVPREC + 6, char);
+    Newxz(exp_str, MAX_DEC_DIG + 6, char);
     if(exp_str == NULL) croak("Failed (in 'else' block) to allocate memory for exp_str in fmtpy function");
     for(i = 2; i <= len; i++) exp_str[i - 2] = s[i];
     exponent = atoi(exp_str);
     if(exponent < -9) {
+      /* Return, eg, '5E-10' as '5e-10' */
       s[1] = 'e';
       if(is_neg) s--;
       Safefree(exp_str);
@@ -310,6 +315,7 @@ SV * fmtpy(pTHX_ SV * in) {
     }
     /* Put the string to return into exp_str */
     if(exponent < -4) {
+      /* Return, eg, '5E-9' as '5e-09'. */
       if(is_neg) exp_str[0] = '-';
       exp_str[0 + is_neg] = s[0];
       exp_str[1 + is_neg] = 'e';
@@ -319,76 +325,53 @@ SV * fmtpy(pTHX_ SV * in) {
       exp_str[5 + is_neg] = '\0';
       outsv = newSVpv(exp_str, 0);
       Safefree(exp_str);
+      if(is_neg) s--;
       return outsv;
     }
 
-    if(exponent >= 0 && exponent <= NVPREC) {
-      if(is_neg) {
-        exp_str[0] = '-';
-        exp_str[1] = s[0];
-        for(dec = 0; dec < exponent; dec++) {
-          exp_str[2 + dec] = '0';
-        }
-        exp_str[2 + dec] = '.';
-        exp_str[3 + dec] = '0';
-        exp_str[4 + dec] = '\0';
-      }
-      else {
-        exp_str[0] = s[0];
-        for(dec = 1; dec <= exponent; dec++) {
-          exp_str[dec] = '0';
-        }
-        exp_str[dec] = '.';
-        exp_str[1 + dec] = '0';
-        exp_str[2 + dec] = '\0';
-      }
+    if(exponent >= 0 && exponent <= MAX_DEC_DIG - 2) {
+      /* Return, eg, '5E13' as '50000000000000.0' */
+      if(is_neg) exp_str[0] = '-';
+      exp_str[0 + is_neg] = s[0];
+      for(dec = 0; dec < exponent; dec++) exp_str[1 + is_neg + dec] = '0';
+      exp_str[1 + is_neg + dec] = '.';
+      exp_str[2 + is_neg + dec] = '0';
+      exp_str[3 + is_neg + dec] = '\0';
+
       outsv = newSVpv(exp_str, 0);
       Safefree(exp_str);
+      if(is_neg) s--;
       return outsv;
     }
 
-    if(exponent > NVPREC) {
-      if(is_neg) {
-        exp_str[0] = '-';
-        exp_str[1] = s[0];
-        exp_str[2] = 'e';
-        exp_str[3] = '+';
-        for(dec = 2; dec < len; dec++) {
-        exp_str[dec + 2] = s[dec];
-        }
-        exp_str[dec + 2] = '\0';
-      }
-      else {
-        exp_str[0] = s[0];
-        exp_str[1] = 'e';
-        exp_str[2] = '+';
-        for(dec = 2; dec < len; dec++) {
-        exp_str[dec + 1] = s[dec];
-        }
-        exp_str[dec + 1] = '\0';
-      }
+    if(exponent > MAX_DEC_DIG - 2) {
+      /* Return, eg, '8E50' as '8e+50' */
+      if(is_neg) exp_str[0] = '-';
+      exp_str[0 + is_neg] = s[0];
+      exp_str[1 + is_neg] = 'e';
+      exp_str[2 + is_neg] = '+';
+      for(dec = 2; dec < len; dec++) exp_str[dec + 1 + is_neg] = s[dec];
+      exp_str[dec + 1 + is_neg] = '\0';
       outsv = newSVpv(exp_str, 0);
       Safefree(exp_str);
+      if(is_neg) s--;
       return outsv;
     }
 
-    if(is_neg) {
-      exp_str[0] = '-';
-      exp_str[1] = '0';
-      exp_str[2] = '.';
-      for(dec = -1; dec > exponent; dec--)  exp_str[2 - dec] = '0';
-      exp_str[2 - dec] = s[0];
-      exp_str[2 - (dec - 1)] = '\0';
-    }
-    else {
-      exp_str[0] = '0';
-      exp_str[1] = '.';
-      for(dec = -1; dec > exponent; dec--)  exp_str[1 - dec] = '0';
-      exp_str[1 - dec] = s[0];
-      exp_str[1 - (dec - 1)] = '\0';
-    }
+    /* Exponent is in  the range -1 to -4. We   *
+     * want, eg, '7E-1' to be returned as '0.7' *
+     * and '-9E-4' to be returned as '-0.0009'  */
+
+    if(is_neg)  exp_str[0] = '-';
+    exp_str[0 + is_neg] = '0';
+    exp_str[1 + is_neg] = '.';
+    for(dec = -1; dec > exponent; dec--)  exp_str[1 + is_neg - dec] = '0';
+    exp_str[1 + is_neg - dec] = s[0];
+    exp_str[2 + is_neg - dec] = '\0';
+
     outsv = newSVpv(exp_str, 0);
     Safefree(exp_str);
+    if(is_neg) s--;
     return outsv;
   }
 }
