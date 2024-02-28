@@ -46,7 +46,7 @@
 
    If `perl -V:nvtype` reports anything other than 'double', then the C
    compiler that built perl (and which will build this module) must provide
-   the 'uint128_t' data type.
+   the '__uint128_t' data type.
    This generally means that, if you have a 32-bit build of perl, you won't
    be able to build this module if 'nvtype' is other than 'double'.
    (It is, of course, quite rare to have a 32-bit build of perl with an

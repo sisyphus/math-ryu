@@ -17,7 +17,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    NVs of type 'double', '__float128' and 'long double' (but not
    DoubleDouble), are now supported, though the 'long double' and
    '__float128' support requires that the underlying C compiler
-   provides the uint128_t data type. This caveat probably rules out
+   provides the __uint128_t data type. This caveat probably rules out
    'long double' and '__float128' support on old 32-bit builds of perl,
    but not on the vast majority of modern 64-bit builds.
 

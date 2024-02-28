@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Cwd;
 
-# We need to know whether the uint128_t type is available.
+# We need to know whether the __uint128_t type is available.
 my $defines = '';
 
 my $mycc    = '';
