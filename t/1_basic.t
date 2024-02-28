@@ -37,8 +37,15 @@ cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
 
 cmp_ok(nv2s(6e-7),  'eq',  '6e-07',  "Me-0P ok");
 cmp_ok(nv2s(-6e-7), 'eq', '-6e-07', "-Me-0P ok");
-cmp_ok(nv2s(6e-117),  'eq',  '6e-117',  "Me-PPP ok");
-cmp_ok(nv2s(-6e-117), 'eq', '-6e-117', "-Me-PPP ok");
+
+# Most old shit perls (pre-5.30.0) might fail to assign the
+# value correctly, so we avoid next 2 tests on such systems.
+
+if($] >= 5.03 || Math::Ryu::MAX_DEC_DIG == 36) {
+  cmp_ok(nv2s(6e-117),  'eq',  '6e-117',  "Me-PPP ok");
+  cmp_ok(nv2s(-6e-117), 'eq', '-6e-117', "-Me-PPP ok");
+}
+
 cmp_ok(nv2s(6e40),  'eq',  '6e+40',  "Me+PP ok");
 cmp_ok(nv2s(-6e40), 'eq', '-6e+40', "-Me+PP ok");
 cmp_ok(nv2s(6e9),   'eq',  '6000000000.0',  "Me+P ok");
