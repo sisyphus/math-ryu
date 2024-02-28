@@ -3,6 +3,7 @@ Changes
 Makefile.PL
 MANIFEST
 math_ryu_include.h
+README
 Ryu.pm
 Ryu.pod
 Ryu.xs
