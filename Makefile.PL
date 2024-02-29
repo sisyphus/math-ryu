@@ -5,6 +5,8 @@ use Cwd;
 
 # We need to know whether the __uint128_t type is available.
 my $defines = '';
+my $ccflags = $Config::Config{ccflags}; # Below, we will append '-std=c99' to the
+                                        # CCFLAGS, if we detect that it's necessary.
 
 my $mycc    = '';
 my $avoid_generic_128 = 0;
@@ -56,7 +58,10 @@ if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
     my $make = $Config::Config{make};
     my $cc = $Config::Config{cc};
     my @flags = ("CC=$cc");
-    push(@flags, "CFLAGS=-fPIC -std=c99") if $Config::Config{cccdlflags} =~ /\-fPIC/;
+    if($Config::Config{cccdlflags} =~ /\-fPIC/) {
+      push(@flags, "CFLAGS=-fPIC -std=c99");
+      $ccflags .= ' -std=c99' unless $ccflags =~ /\-std=c99/;
+    }
     system($make, @flags);
   }
 
@@ -70,6 +75,7 @@ my %options = (
   NAME => 'Math::Ryu',
   PREREQ_PM    => { 'Test::More' => '0.88', },
   DEFINE       => $defines,
+  CCFLAGS      => $ccflags,
   LICENSE      => 'perl',
   INC          => "-I${top_dir}/${lib_loc}",
   VERSION_FROM => 'Ryu.pm',
