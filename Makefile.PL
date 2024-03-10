@@ -62,6 +62,8 @@ if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
       push(@flags, "CFLAGS=-fPIC -std=c99");
       $ccflags .= ' -std=c99' unless $ccflags =~ /\-std=c99/;
     }
+    $ccflags .= '-KPIC' if $Config::Config{cccdlflags} =~ /\-KPIC/; # Might fix (?) solaris failure:
+                                                                    # https://www.cpantesters.org/cpan/report/7e6176b8-d7b0-11ee-ae74-376db46fd3dd
     system($make, @flags);
   }
 
