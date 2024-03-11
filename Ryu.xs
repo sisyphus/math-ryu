@@ -291,8 +291,13 @@ SV * fmtpy(pTHX_ SV * in) {
   else {
     /*** NO DECIMAL POINT IN STRING ***/
     if(s[0] == 'I') {
-      if(is_neg) return newSVpv("-inf", 0);
-      else return newSVpv("inf", 0);
+      if(is_neg) {
+        s--;
+        return newSVpv("-inf", 0);
+      }
+      else {
+        return newSVpv("inf", 0);
+      }
     }
     if(s[0] == 'N') {
       if(is_neg) {
