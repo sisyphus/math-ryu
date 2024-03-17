@@ -29,7 +29,7 @@
 
 typedef struct floating_decimal_128 t_fd128;
 
-#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128)
+#if defined(COMPILER_HAS_UINT128_T) && !defined(AVOID_GENERIC_128) && MAX_DEC_DIG == 36
 /* To be called only by q2s(). Cannot be accessed directly from perl */
 struct floating_decimal_128 quad_to_fd128(NV d) {
   uint128_t bits = 0;

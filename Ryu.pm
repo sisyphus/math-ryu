@@ -66,7 +66,7 @@ DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
   d2s ld2s q2s nv2s
-  pn pnv sn snv
+  pn pnv pany sn snv sany
   n2s
   s2d
   fmtpy fmtpy_pp
@@ -214,6 +214,26 @@ sub pnv {
 sub snv {
   my $nv = shift;
   print nv2s($nv), "\n";
+}
+
+sub pany {
+  my $arg = shift;
+  if(ryu_lln($arg)) {
+    print n2s($arg);
+  }
+  else {
+    print $arg;
+  }
+}
+
+sub sany {
+  my $arg = shift;
+  if(ryu_lln($arg)) {
+    print n2s($arg), "\n";
+  }
+  else {
+    print $arg, "\n";
+  }
 }
 
 1;
