@@ -55,6 +55,10 @@ BEGIN {
 use constant PV_NV_BUG   => $Math::Ryu::PV_NV_BUG;
 use constant IVSIZE      => $Config{ivsize};
 use constant MAX_DEC_DIG => $::max_dig; # set in second BEGIN{} block
+use constant RYU_MAX_INT => $Config{ivsize} == 4 ? 4294967295
+                                                 : 18446744073709551615;
+use constant RYU_MIN_INT => $Config{ivsize} == 4 ? -2147483648
+                                                 : -9223372036854775808;
 
 require Exporter;
 *import = \&Exporter::import;
@@ -67,6 +71,7 @@ DynaLoader::bootstrap Math::Ryu $VERSION;
 my @tagged = qw(
   d2s ld2s q2s nv2s
   pn pnv pany sn snv sany
+  spanyf
   n2s
   s2d
   fmtpy fmtpy_pp
@@ -91,15 +96,12 @@ sub nv2s {
 
 sub n2s {
   my $arg = shift;
-  my $ref = ref($arg);
-  die "n2s() does not currently handle  \"$ref\" references"
-    if $ref;
-  return "$arg" if _SvIOK($arg);
-  if(PV_NV_BUG && _SvPOK($arg)) {
-    # perl might have set the POK flag when it should not
-    return nv2s($arg) if (_SvNOK($arg) && !_SvIOKp($arg));
-  }
+   die "n2s() does not currently handle ",  ref($arg), " references"
+    if ref($arg);
+  return "$arg" if ( _SvIOK($arg) || _NV_fits_IV($arg) );
   return nv2s($arg) if _SvNOK($arg);
+  # When this sub is called by pany() or sany(), it
+  # will have returned before reaching here.
   # $arg is neither integer nor float nor reference.
   # If the numified $arg fits into an IV, return the
   # stringification of that value.
@@ -216,24 +218,50 @@ sub snv {
   print nv2s($nv), "\n";
 }
 
-sub pany {
-  my $arg = shift;
-  if(ryu_lln($arg)) {
-    print n2s($arg);
-  }
-  else {
-    print $arg;
+sub pany { # "p"rint "any"
+  for my $arg (@_) {
+    if(ryu_lln($arg)) {
+      print n2s($arg);
+    }
+    else {
+      print $arg;
+    }
   }
 }
 
-sub sany {
-  my $arg = shift;
-  if(ryu_lln($arg)) {
-    print n2s($arg), "\n";
+sub sany { # "s"ay "any"
+  for my $arg (@_) {
+    if(ryu_lln($arg)) {
+      print n2s($arg);
+    }
+    else {
+      print $arg;
+    }
   }
-  else {
-    print $arg, "\n";
+  print "\n";
+}
+
+sub spanyf {
+  # Returns the string that pany() would have
+  # printed, given the same argument(s).
+  my $ret = '';
+  for my $arg (@_) {
+    if(ryu_lln($arg)) {
+      $ret .= n2s($arg);
+    }
+    else {
+      $ret .= "$arg";
+    }
   }
+  return $ret;
+}
+
+sub _NV_fits_IV {
+  # Called only when the argument is an NV
+  my $nv = shift;
+  return 0 if $nv != int($nv);
+  return 1 if ( $nv <= RYU_MAX_INT && $nv >= RYU_MIN_INT );
+  return 0;
 }
 
 1;

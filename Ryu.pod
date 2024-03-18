@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Math::Ryu - perl interface to Ryu (NV-to-string conversion).
+Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
 =head1 DEPENDENCIES
 
@@ -37,7 +37,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    to provide the stringification. Then we will find that, except for
    NaN, the condition ( sprintf("%.17g", $nv) == $nv ) is always true.
    But this presents another problem in that "%.17g" formatting will
-   sometimes provide more sugnificant decimal digits than are needed.
+   sometimes provide more significant decimal digits than are needed.
    For example:
     printf("%.17g", 0.1); # prints '0.10000000000000001', even though
                           # the condition ("0.1" == 0.1) is also true.
@@ -151,7 +151,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
 
 =head1 PRINT FUNCTIONS
 
-  Just some shorthand ways of printing out values.
+  Just some shorthand ways of printing out values to STDOUT.
 
   pnv($nv); # mnemonic: "print nv2s($nv)"
   snv($nv); # mnemonic: "say nv2s($nv)"
@@ -165,17 +165,28 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
    prints n2s($sv) to STDOUT.
    prints n2s($sv)."\n" to STDOUT.
 
-  pany($sv);
-  sany($sv);
-  Respectively:
-   calls pn($sv) if $sv is a number - else calls "print $sv";
+  pany(@args); # "p"rint "any"
+  sany(@args); # "s"ay   "any"
+   Respectively:
+   calls pn($arg) for args that look like a number - else calls
+   "print $arg";
    and
-   calls sn($sv) if $sv is a number - else calls the equivalent of
-   "say $sv".
+   calls sn($arg) for args that look lije a number - else calls
+   the equivalent of "say $arg".
    These last 2 functions aim to DWYM, irrespective of the type of
-   argument that is passed to them. They do not evaluate strings
-   in numeric context, but print them as they are.
-   YMMV.
+   argument(s) passed to them.
+   They print out nv2s($arg) for arguments that are non-zero NVs.
+   For all other types of arguments they print out the same as
+   print($arg).
+   Unlike "print", which is generally called without bracketed
+   arguments, "pany()" and "sany()" should be called with their
+   arguments enclosed in brackets.
+
+=head1 SPRINTF FUNCTION
+
+  $str = spanyf(@args);
+   Return the string that pany(@args) would have printed.
+   The given arguments should be enclosed in brackets.
 
 =head1 LICENSE
 
