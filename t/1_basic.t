@@ -33,6 +33,13 @@ else {
   cmp_ok($s, 'eq', '0.13999999999999999999999999999999999', "fmtpy(q2s(1.4 / 10)) is as expected");
 }
 
+# It's not intended for nv2s() to take a string as its argument,
+# but let's keep an eye on the behaviour anyway:
+cmp_ok(nv2s('hello'), 'eq', '0.0', "nv2s('hello') returns 0.0");
+my $t = nv2s(1.4 / 10);
+$t .= 'mmm';
+cmp_ok(nv2s($t), 'eq', nv2s(1.4 / 10), "nv2s('$t') behaves ok");
+
 cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
 
 cmp_ok(nv2s(6e-7),  'eq',  '6e-07',  "Me-0P ok");
