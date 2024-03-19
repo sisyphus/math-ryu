@@ -79,19 +79,19 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 =head1 FUNCTIONS
 
    $str = nv2s($nv);
-    I think n2s() and nv2s() probably produce the same result.
-    $nv holds a perl floating point numeric value (NV). $str is a string in
-    floating point format, that accurately and succinctly represents the
-    value held by $nv. When $str is correctly assigned to a perl number,
-    that nnumber will be equivalent to $nv. Also, $str will contain as few
-    digits as possible, without compromising that accuracy.
+    Treats the argument as an NV, even if it's not.
+    You can check that the argument $nv is an NV by checking that the
+    condition (!ryu_SvIOK($nv) && ryu_SvNOK($nv)) is TRUE.
+    $str is a string in floating point format that accurately and
+    succinctly represents the value held by $nv. When $str is correctly
+    assigned to a perl number, that number will be equivalent to $nv.
+    Also, $str will contain as few digits as possible, without
+    compromising that accuracy.
     $str is formatted by fmtpy() - documented below. (The format is the
     same as provided by Python3's print() function for the same value.)
-    There is no need for the caller to know the type of NV (nvtype) that
+    There is no need for the caller to know the type (nvtype) of NV that
     $nv is - the nv2s() function handles that.
-    Arguments that are references will be rejected, causing the script to
-    die with an explanatory message. Other arguments that are not an NV
-    will be coerced to NV, following the usual rules that perl employs.
+
 
     Note: nv2s() spends some time reformatting the string that the ryu
           library returned. If you are happy enough with that original
@@ -103,7 +103,8 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
           and "without" reformatting.
 
    $str = n2s($sv);
-    I think n2s() and nv2s() probably produce the same result.
+    Use this function if the argument is to be evaluated in numeric context.
+    Arguments that are perl references will throw an exception.
     Handles "integer", "floating point" and "string" values. If the
     argument is a floating point numeric value, then this function returns
     the same as nv2s(). Otherwise, it stringifies the numeric value of the
@@ -167,26 +168,25 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   pany(@args); # "p"rint "any"
   sany(@args); # "s"ay   "any"
-   Respectively:
-   calls pn($arg) for args that look like a number - else calls
-   "print $arg";
-   and
-   calls sn($arg) for args that look lije a number - else calls
-   the equivalent of "say $arg".
-   These last 2 functions aim to DWYM, irrespective of the type of
-   argument(s) passed to them.
-   They print out nv2s($arg) for arguments that are non-zero NVs.
+   Both print out n2s($arg) for arguments for which the perl API
+   function looks_like_number() returns true.
    For all other types of arguments they print out the same as
    print($arg).
+   After sany() has printed the final arg, a terminating "\n" is printed.
+   Otherwise sany() and pany() are identical.
+   The aim is that pany/sany alone will suffice, and there is no need
+   for the user to ever call perl's print()/say() function if Math::Ryu
+   has been loaded.
    Unlike "print", which is generally called without bracketed
    arguments, "pany()" and "sany()" should be called with their
-   arguments enclosed in brackets.
+   argument(s) enclosed in brackets.
 
 =head1 SPRINTF FUNCTION
 
   $str = spanyf(@args);
    Return the string that pany(@args) would have printed.
-   The given arguments should be enclosed in brackets.
+   Note that the arguments given to spanyf() are enclosed in brackets,
+   just as with pany() and sany().
 
 =head1 LICENSE
 

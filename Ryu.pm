@@ -75,7 +75,7 @@ my @tagged = qw(
   n2s
   s2d
   fmtpy fmtpy_pp
-  ryu_lln
+  ryu_lln ryu_SvIOK ryu_SvNOK
   );
 
 @Math::Ryu::EXPORT = ();
@@ -96,10 +96,10 @@ sub nv2s {
 
 sub n2s {
   my $arg = shift;
-   die "n2s() does not currently handle ",  ref($arg), " references"
+  die "The n2s() function does not accept ", ref($arg), " references"
     if ref($arg);
-  return "$arg" if ( _SvIOK($arg) || _NV_fits_IV($arg) );
-  return nv2s($arg) if _SvNOK($arg);
+  return "$arg" if (!_SvPOK($arg) && (ryu_SvIOK($arg) || _NV_fits_IV($arg)) );
+  return nv2s($arg) if ryu_SvNOK($arg);
   # When this sub is called by pany() or sany(), it
   # will have returned before reaching here.
   # $arg is neither integer nor float nor reference.
@@ -107,10 +107,9 @@ sub n2s {
   # stringification of that value.
   # Else, return nv2s($arg), which will coerce $arg
   # to an NV.
-  if(_SvIOK($arg + 0)) {
-    my $ret = $arg + 0;
-    return "$ret";
-  }
+  my $ret = $arg + 0;
+  return "$ret"     if ryu_SvIOK($ret);
+  #return nv2s($ret) if ryu_SvNOK($ret);
   return nv2s($arg);
 }
 

@@ -30,4 +30,14 @@ my $str = spanyf($ref);
 like($str, qr/^SCALAR\(0/, "$str starts correctly");
 like($str, qr/[a-fA-F0-9]\)$/, "$str ends correctly");
 
+$str = '6.5rubbish';
+cmp_ok(n2s($str), 'eq', '6.5', "n2s('6.5 rubbish') handled as expected");
+cmp_ok(n2s('hello world'), 'eq', '0.0', "n2s('hello world') returns 0.0");
+
+my $newstr = spanyf($str);
+cmp_ok($newstr, 'eq', '6.5rubbish', "string is still assessed by spanyf() as '6.5rubbish'");
+
+eval{my $s = n2s($mbi);};
+like($@, qr/^The n2s\(\) function does not accept/, "passing of a reference to n2s() is disallowed");
+
 done_testing();

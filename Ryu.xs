@@ -94,12 +94,12 @@ SV * q2s(pTHX_ SV * nv) {
 #endif
 }
 
-int _SvIOK(SV * sv) {
+int ryu_SvIOK(SV * sv) {
     if(SvIOK(sv)) return 1;
     return 0;
 }
 
-int _SvNOK(SV * sv) {
+int ryu_SvNOK(SV * sv) {
     if(SvNOK(sv)) return 1;
     return 0;
 }
@@ -413,11 +413,11 @@ CODE:
 OUTPUT:  RETVAL
 
 int
-_SvIOK (sv)
+ryu_SvIOK (sv)
 	SV *	sv
 
 int
-_SvNOK (sv)
+ryu_SvNOK (sv)
 	SV *	sv
 
 int
