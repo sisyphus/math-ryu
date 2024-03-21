@@ -114,6 +114,7 @@ sub n2s {
 }
 
 sub fmtpy_pp {
+  # Pure perl rendition of the fmtpy function. Not exported.
   # The given argument will be either 'Infinity', '-Infinity', 'NaN'
   # or a finite value of the form "mantissaEexponent".
   # The mantissa portion will include a decimal point (with that decimal
