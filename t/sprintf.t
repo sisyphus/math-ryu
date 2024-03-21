@@ -30,6 +30,9 @@ my $str = spanyf($ref);
 like($str, qr/^SCALAR\(0/, "$str starts correctly");
 like($str, qr/[a-fA-F0-9]\)$/, "$str ends correctly");
 
+$str = nv2s($ref);
+like($str, qr/\d\.0$/, "nv2s() returns a number when handed a scalar reference");
+
 $str = '6.5rubbish';
 cmp_ok(n2s($str), 'eq', '6.5', "n2s('6.5 rubbish') handled as expected");
 cmp_ok(n2s('hello world'), 'eq', '0.0', "n2s('hello world') returns 0.0");
