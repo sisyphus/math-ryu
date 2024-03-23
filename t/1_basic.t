@@ -38,7 +38,13 @@ else {
 cmp_ok(nv2s('hello'), 'eq', '0.0', "nv2s('hello') returns 0.0");
 my $t = nv2s(1.4 / 10);
 $t .= 'mmm';
-cmp_ok(nv2s($t), 'eq', nv2s(1.4 / 10), "nv2s('$t') behaves ok");
+
+if($] < 5.03 && $Config{nvtype} eq 'double' && 0.13999999999999999 == 0.14) {
+  warn "Skipping a test because this perl ($]) assigns the string '0.13999999999999999' incorrectly\n";
+}
+else {
+  cmp_ok(nv2s($t), 'eq', nv2s(1.4 / 10), "nv2s('$t') behaves ok");
+}
 
 cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
 

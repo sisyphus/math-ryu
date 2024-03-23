@@ -43,4 +43,9 @@ cmp_ok($newstr, 'eq', '6.5rubbish', "string is still assessed by spanyf() as '6.
 eval{my $s = n2s($mbi);};
 like($@, qr/^The n2s\(\) function does not accept/, "passing of a reference to n2s() is disallowed");
 
+$str = '9' x 5000;
+$nv = $str + 0;
+
+cmp_ok(spanyf($nv, ' ', $str), 'eq', 'inf inf', "string is numified as expected");
+
 done_testing();
