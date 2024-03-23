@@ -10,7 +10,7 @@ END{ done_testing(); };
 
 if($Config{nvsize} != 8) {
   eval {d2s(3.5);};
-  like($@, qr/is available only/, "ld2s() not available");
+  like($@, qr/is available only/, "d2s() not available");
   exit 0;
 }
 
@@ -30,6 +30,11 @@ for (-324 .. -290, -200 .. -180, -50 .. 50, 200 .. 250) {
     cmp_ok(s2d(d2s($nv)), '==', $nv, sprintf("%.17g", $nv) . ": round trip succeeds");
   }
 }
+
+# Also check that s2d() croaks as expected if ryu_lln($arg) returns false.
+
+eval {s2d('1.3x');};
+like($@, qr/^Strings passed to s2d\(\)/, "s2d() rejects strings that don't \"look like a number\"");
 
 sub random_digits {
     my $ret = '';

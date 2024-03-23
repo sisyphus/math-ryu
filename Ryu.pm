@@ -155,6 +155,8 @@ sub s2d {
   return $double_inf  if $str =~ /^(\s+|\+)?inf/i;
   return -$double_inf if $str =~ /^(\s+)?\-inf/i;
   return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+  die("Strings passed to s2d() must \"look like a number\"")
+    unless ryu_lln($str);
   return _s2d($str);
 }
 
