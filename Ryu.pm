@@ -152,11 +152,23 @@ sub s2d {
   die "s2d() is available only to perls whose NV is of type 'double'"
     unless MAX_DEC_DIG == 17;
   my $str = shift;
-  return $double_inf  if $str =~ /^(\s+|\+)?inf/i;
-  return -$double_inf if $str =~ /^(\s+)?\-inf/i;
-  return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+
   die("Strings passed to s2d() must \"look like a number\"")
     unless ryu_lln($str);
+  # For _s2d, we need to remove all leading and trailing whitespace.
+  # If $str contained internal whitespace, then s2d has already died.
+  $str =~ s/\s//g;
+
+  # _s2d doesn't handle inf/nan, so we attend to that first.
+  # However, if perl recognizes these strings as numeric, then it's
+  # not really necessary to assign them using s2d.
+  # And if perl does NOT recognize these strings as numeric, then s2d
+  # is simply going to croak.
+  # Anyway, here they are:
+  return $double_inf  if $str =~ /^\+?inf/i;
+  return -$double_inf if $str =~ /^\-inf/i;
+  return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+
   return _s2d($str);
 }
 

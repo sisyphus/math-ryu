@@ -147,10 +147,11 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   $nv = s2d($str); # string to double
    Available only to perls whose $Config{nvsize} is 8.
-   Returns an inf or nan as (and when) appropriate.
-   Else, if ryu_lln($str) returns a false value, then the s2d()
-   call will die with an appropriate error message.
-   Otherwise, it returns an NV of the specified 'double' value.
+   If ryu_lln($str) returns a false value, then the s2d() call
+   will die with an appropriate error message.
+   Otherwise, it returns an NV (double) of the specified value.
+   (This can be useful on pre-5.30.0 perls, where perl frequently
+   assigns values incorrectly.)
 
 
 =head1 PRINT FUNCTIONS
