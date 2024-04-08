@@ -382,6 +382,13 @@ SV * fmtpy(pTHX_ SV * in) {
   }
 }
 
+SV * _from_NV(pTHX_ NV arg ) {
+  if(arg >= 0)  {
+    return newSVuv((UV)arg);
+  }
+  return newSViv((IV)arg);
+}
+
 
 MODULE = Math::Ryu  PACKAGE = Math::Ryu PREFIX = M_RYU_
 
@@ -446,3 +453,12 @@ fmtpy (in)
 CODE:
   RETVAL = fmtpy (aTHX_ in);
 OUTPUT:  RETVAL
+
+SV *
+_from_NV (arg)
+	NV	arg
+CODE:
+  RETVAL = _from_NV (aTHX_ arg);
+OUTPUT:  RETVAL
+
+

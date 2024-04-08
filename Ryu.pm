@@ -58,7 +58,11 @@ sub n2s {
   my $arg = shift;
   die "The n2s() function does not accept ", ref($arg), " references"
     if ref($arg);
-  return "$arg" if (!_SvPOK($arg) && (ryu_SvIOK($arg) || _NV_fits_IV($arg)) );
+  #return "$arg" if (!_SvPOK($arg) && (ryu_SvIOK($arg) || _NV_fits_IV($arg)) );
+  if(!_SvPOK($arg)) {
+    return $arg if ryu_SvIOK($arg);
+    return _from_NV($arg) if _NV_fits_IV($arg);
+  }
   return nv2s($arg) if ryu_SvNOK($arg);
   # When this sub is called by pany() or sany(), it
   # will have returned before reaching here.
