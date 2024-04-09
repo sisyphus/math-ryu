@@ -81,7 +81,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    $str = nv2s($nv);
     Treats the argument as an NV, even if it's not.
     You can check that the argument $nv is an NV by checking that the
-    condition (!ryu_SvIOK($nv) && ryu_SvNOK($nv)) is TRUE.
+    condition (!ryu_SvPOK($nv) && ryu_SvNOK($nv)) is TRUE.
     $str is a string in floating point format that accurately and
     succinctly represents the value held by $nv. When $str is correctly
     assigned to a perl number, that number will be equivalent to $nv.
@@ -145,6 +145,11 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    There's not really any reason to export this subroutine, but
    it's there to use if it's ever helpful.
 
+   $bool = ryu_SvIOK($sv);
+   $bool = ryu_SvNOK($sv);
+    Return 1 if the IOK (respectively, NOK) flag of $sv is set.
+    Else return 0.
+
   $nv = s2d($str); # string to double
    Available only to perls whose $Config{nvsize} is 8.
    If ryu_lln($str) returns a false value, then the s2d() call
@@ -160,37 +165,54 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   pnv($nv); # mnemonic: "print nv2s($nv)"
   snv($nv); # mnemonic: "say nv2s($nv)"
-   Respectively:
-   prints nv2s($nv) to STDOUT;
-   and
+   (nv2s is documented above in "FUNCTIONS".)
+   prints nv2s($nv) to STDOUT
+   and respectively:
    prints nv2s($nv)."\n" to STDOUT.
 
   pn($sv); # mnemonic: "print n2s($sv)"
   sn($sv); # mnemonic: "say n2s($sv)"
-   prints n2s($sv) to STDOUT.
+   (n2s is documented above in "FUNCTIONS".)
+   prints n2s($sv) to STDOUT
+   and respectively:
    prints n2s($sv)."\n" to STDOUT.
 
   pany(@args); # "p"rint "any"
   sany(@args); # "s"ay   "any"
-   Both print out n2s($arg) for arguments for which the perl API
-   function looks_like_number() returns true.
-   For all other types of arguments they print out the same as
-   print($arg).
+   Both functions print out $arg if the perl API function
+   looks_like_number($arg) returns true && either:
+     a) the POK flag is set;
+     or
+     b) the IOK flag is set.
+
+   If that looks_like_number($arg) returns true but both the POK and
+   IOK flags are unset, then $arg must be an NV.
+   If that NV fits into an IV, then cast it to an IV, and print out
+   that (IV) value. Else print out nv2s($arg).
+
+   For all other arguments (ie those for which looks_like_number($arg)
+   has returned false), we simply print($arg).
+
    After sany() has printed the final arg, a terminating "\n" is printed.
    Otherwise sany() and pany() are identical.
+   We should find that pany() and sany() produce  outputs aidentical to
+   print() - except for those NV values that perl would misrepresent.
    The aim is that pany/sany alone will suffice, and there is no need
-   for the user to ever call perl's print()/say() function if Math::Ryu
-   has been loaded.
-   Unlike "print", which is generally called without bracketed
-   arguments, "pany()" and "sany()" should be called with their
+   for the user to ever call perl's print()/say() functions if
+   Math::Ryu has been loaded.
+   Of course, if you really do want to print out an NV as stringified
+   by perl (as opposed to being stringified by nv2s) then you'll need
+   to use print/say, not pany()/sany().
+   Unlike "print" and "say", which are generally called without
+   bracketed args, "pany()" and "sany()" should be called with their
    argument(s) enclosed in brackets.
 
 =head1 SPRINTF FUNCTION
 
-  $str = spanyf(@args);
+  $str = spanyf(@args); # No "format" arg - not *really* a "sprintf"
    Return the string that pany(@args) would have printed.
-   Note that the arguments given to spanyf() are enclosed in brackets,
-   just as with pany() and sany().
+   Note that the arguments given to spanyf() should be enclosed in
+   brackets, just as with pany() and sany().
 
 =head1 LICENSE
 

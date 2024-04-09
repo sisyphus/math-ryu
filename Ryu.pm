@@ -198,8 +198,14 @@ sub snv {
 sub pany { # "p"rint "any"
   for my $arg (@_) {
     if(ryu_lln($arg)) {
-      if(_SvPOK($arg)) { print $arg }
-      else { print n2s($arg)}
+      if(_SvPOK($arg) || ryu_SvIOK($arg)) { print $arg }
+      else {
+        # At this point we know that $arg looks like a number
+        # and neither its POK flag nor its NOK flag is set.
+        # It must be an NV.
+        if(_NV_fits_IV($arg)) { print _from_NV($arg) }
+        else { print nv2s($arg) }
+      }
     }
     else {
       print $arg;
@@ -218,8 +224,14 @@ sub spanyf {
   my $ret = '';
   for my $arg (@_) {
     if(ryu_lln($arg)) {
-      if(_SvPOK($arg)) { $ret .= "$arg" }
-      else { $ret .= n2s($arg) }
+      if(_SvPOK($arg) || ryu_SvIOK($arg)) { $ret .= "$arg" }
+      else {
+        # At this point we know that $arg looks like a number
+        # and neither its POK flag nor its NOK flag is set.
+        # It must be an NV.
+        if(_NV_fits_IV($arg)) { $ret .= _from_NV($arg) }
+        else { $ret .= nv2s($arg) }
+      }
     }
     else {
       $ret .= "$arg";
