@@ -58,7 +58,6 @@ sub n2s {
   my $arg = shift;
   die "The n2s() function does not accept ", ref($arg), " references"
     if ref($arg);
-  #return "$arg" if (!_SvPOK($arg) && (ryu_SvIOK($arg) || _NV_fits_IV($arg)) );
   if(!_SvPOK($arg)) {
     return $arg if ryu_SvIOK($arg);
     return _from_NV($arg) if _NV_fits_IV($arg);
@@ -199,7 +198,8 @@ sub snv {
 sub pany { # "p"rint "any"
   for my $arg (@_) {
     if(ryu_lln($arg)) {
-      print n2s($arg);
+      if(_SvPOK($arg)) { print $arg }
+      else { print n2s($arg)}
     }
     else {
       print $arg;
@@ -207,15 +207,8 @@ sub pany { # "p"rint "any"
   }
 }
 
-sub sany { # "s"ay "any"
-  for my $arg (@_) {
-    if(ryu_lln($arg)) {
-      print n2s($arg);
-    }
-    else {
-      print $arg;
-    }
-  }
+sub sany {
+  pany(@_);
   print "\n";
 }
 
@@ -225,7 +218,8 @@ sub spanyf {
   my $ret = '';
   for my $arg (@_) {
     if(ryu_lln($arg)) {
-      $ret .= n2s($arg);
+      if(_SvPOK($arg)) { $ret .= "$arg" }
+      else { $ret .= n2s($arg) }
     }
     else {
       $ret .= "$arg";

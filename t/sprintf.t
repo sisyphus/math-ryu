@@ -47,7 +47,7 @@ like($@, qr/^The n2s\(\) function does not accept/, "passing of a reference to n
 $str = '9' x 5000;
 $nv = $str + 0;
 
-cmp_ok(spanyf($nv, ' ', $str), 'eq', 'inf inf', "string is numified as expected");
+cmp_ok(spanyf($nv, ' ', $str), 'eq', "inf $str", "conforms to usual perl practice");
 
 $str = spanyf(-9223372036854775810);
 
