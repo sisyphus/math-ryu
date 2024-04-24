@@ -24,7 +24,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 

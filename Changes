@@ -1,3 +1,5 @@
+1.04
+
 1.03
      - Add new "print" functions pany() and sany(), and "sprintf" function spanyf().
      - Export ryu_SvIOK and and ryu_SvNOK - formerly known as the unexported
