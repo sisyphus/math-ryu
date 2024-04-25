@@ -49,6 +49,12 @@ $nv = $str + 0;
 
 cmp_ok(spanyf($nv, ' ', $str), 'eq', "inf $str", "conforms to usual perl practice");
 
+if($Config{ivsize} == 8) {
+  $str = '-9223372036854775808';
+  my $dis = $str + 1.23;
+  cmp_ok(spanyf($str + 0), 'eq', '-9223372036854775808', "('$str' + 0) is treated as IV");
+}
+
 $str = spanyf(-9223372036854775810);
 
 if(Math::Ryu::MAX_DEC_DIG == 17) {
