@@ -9,7 +9,7 @@ BEGIN {
   # perl bug that can set the POK flag when it should not.
   use B qw(svref_2object);
 
-  if($] < 5.035010) {
+  if($] < 5.035010) { # TODO - Check if this value can be reduced (to around 5.02 ?)
     my %flags;
     {
       no strict 'refs';
@@ -65,7 +65,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
