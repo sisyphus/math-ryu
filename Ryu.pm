@@ -237,31 +237,15 @@ sub snv {
 }
 
 sub pany { # "p"rint "any"
-  for my $arg (@_) {
-    if(ryu_lln($arg)) {
-      if(_SvPOK($arg) || ryu_SvIOK($arg)) { print $arg }
-      else {
-        # At this point we know that $arg looks like a number
-        # and neither its POK flag nor its NOK flag is set.
-        # It must be an NV.
-        if(_NV_fits_IV($arg)) { print _from_NV($arg) }
-        else { print nv2s($arg) }
-      }
-    }
-    else {
-      print $arg;
-    }
-  }
+  print spanyf(@_)
 }
 
 sub sany {
-  pany(@_);
-  print "\n";
+  print spanyf(@_) . "\n";
 }
 
 sub spanyf {
-  # Returns the string that pany() would have
-  # printed, given the same argument(s).
+  # Prepares the string that pany/sany will print.
   my $ret = '';
   for my $arg (@_) {
     if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg)) {
