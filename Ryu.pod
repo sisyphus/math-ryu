@@ -179,19 +179,19 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   pany(@args); # "p"rint "any"
   sany(@args); # "s"ay   "any"
-   Both functions print out $arg if the perl API function
+   Both functions simply do a "print $arg;" if the perl API function
    looks_like_number($arg) returns true && either:
      a) the POK flag is set;
      or
      b) the IOK flag is set.
 
-   If that looks_like_number($arg) returns true but both the POK and
+   If looks_like_number($arg) returns true but both the POK and
    IOK flags are unset, then $arg must be an NV.
    If that NV fits into an IV, then cast it to an IV, and print out
    that (IV) value. Else print out nv2s($arg).
 
    For all other arguments (ie those for which looks_like_number($arg)
-   has returned false), we simply print($arg).
+   has returned false), simply "print $arg;".
 
    After sany() has printed the final arg, a terminating "\n" is printed.
    Otherwise sany() and pany() are identical.
@@ -203,16 +203,27 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    Of course, if you really do want to print out an NV as stringified
    by perl (as opposed to being stringified by nv2s) then you'll need
    to use print/say, not pany()/sany().
+
    Unlike "print" and "say", which are generally called without
    bracketed args, "pany()" and "sany()" should be called with their
-   argument(s) enclosed in brackets.
+   argument(s) enclosed in brackets if any of the arguments are
+   object constructors - eg Math::BigInt->new(42).
+   Otherwise it's probably safe to dispense with the brackets - though,
+   for safety, I recommend using the brackets, anyway.
+
+   To demonstrate this failing, try the following one-liner:
+
+   > perl -MMath::Ryu=":all" -MMath::BigInt -e "pany Math::BigInt->new(1);"
+   Can't locate object method "pany" via package "Math::BigInt" at -e line 1.
 
 =head1 SPRINTF FUNCTION
 
   $str = spanyf(@args); # No "format" arg - not *really* a "sprintf"
-   Return the string that pany(@args) would have printed.
-   Note that the arguments given to spanyf() should be enclosed in
-   brackets, just as with pany() and sany().
+   Return the string that pany(@args) would print.
+   Note that the arguments given to spanyf() should, for safety be
+   enclosed in brackets, just as with pany() and sany() - though again
+   this may well be unnecessary if the argument(s) don't include
+   an object constructor.
 
 =head1 LICENSE
 
