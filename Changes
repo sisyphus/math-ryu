@@ -1,3 +1,5 @@
+1.06
+
 1.05
      - In 1.04, I failed to amend pany() and sany() to allow for the "PV_NV_BUG". This
        is now fixed.
