@@ -1,6 +1,8 @@
 1.05
      - In 1.04, I failed to amend pany() and sany() to allow for the "PV_NV_BUG". This
-       is now fixed
+       is now fixed.
+     - Add is_NV() function which identifies whether its argument is a perl scalar
+       floating point (NV) value.
 
 1.04
      - Reinstate detection of the "PV_NV_BUG" in older perls, and fix a bug in t/sprintf.t.
