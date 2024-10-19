@@ -77,7 +77,7 @@ my @tagged = qw(
   n2s
   s2d
   fmtpy fmtpy_pp
-  ryu_lln ryu_SvIOK ryu_SvNOK
+  ryu_lln ryu_SvIOK ryu_SvNOK ryu_SvPOK ryu_SvIOKp
   );
 
 @Math::Ryu::EXPORT = ();
@@ -100,7 +100,7 @@ sub n2s {
   my $arg = shift;
   die "The n2s() function does not accept ", ref($arg), " references"
     if ref($arg);
-  if(!_SvPOK($arg)) {
+  if(!ryu_SvPOK($arg)) {
     return $arg if ryu_SvIOK($arg);
     return _from_NV($arg) if _NV_fits_IV($arg);
   }
@@ -273,12 +273,12 @@ sub is_NV {
   my $arg = shift;
 
   return 1
-    if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg));
+    if(PV_NV_BUG && ryu_SvPOK($arg) && ryu_SvNOK($arg) && !ryu_SvIOKp($arg));
 
   if(ryu_lln($arg)) { # Wraps the perl API function looks_like_number(),
                       # which differs from Scalar::Util::looks_like_number().
     return 0
-      if(_SvPOK($arg) || ryu_SvIOK($arg));
+      if(ryu_SvPOK($arg) || ryu_SvIOK($arg));
 
     # At this point we know that $arg looks like a number
     # and neither its POK flag nor its IOK flag is set.

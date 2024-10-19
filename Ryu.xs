@@ -104,12 +104,12 @@ int ryu_SvNOK(SV * sv) {
     return 0;
 }
 
-int _SvPOK(SV * sv) {
+int ryu_SvPOK(SV * sv) {
     if(SvPOK(sv)) return 1;
     return 0;
 }
 
-int _SvIOKp(SV * sv) {
+int ryu_SvIOKp(SV * sv) {
     if(SvIOKp(sv)) return 1;
     return 0;
 }
@@ -428,11 +428,11 @@ ryu_SvNOK (sv)
 	SV *	sv
 
 int
-_SvPOK (sv)
+ryu_SvPOK (sv)
 	SV *	sv
 
 int
-_SvIOKp (sv)
+ryu_SvIOKp (sv)
 	SV *	sv
 
 int ryu_lln (sv)
