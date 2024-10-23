@@ -80,6 +80,8 @@ my @tagged = qw(
   ryu_lln ryu_SvIOK ryu_SvNOK ryu_SvPOK ryu_SvIOKp
   );
 
+$ENV{USE_MATH_RYU} = 1; # So that the environment can Know that Math::Ryu has been loaded.
+
 @Math::Ryu::EXPORT = ();
 @Math::Ryu::EXPORT_OK = @tagged;
 %Math::Ryu::EXPORT_TAGS = (all => \@tagged);
