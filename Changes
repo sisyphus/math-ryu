@@ -1,6 +1,5 @@
 1.06
      - Wrap and export SvPOK (as ryu_SvPOK) and SvIOKp (as ryu_SvIOKp).
-     - Set $ENV{USE_MATH_RYU} to 1.
 
 1.05
      - In 1.04, I failed to amend pany() and sany() to allow for the "PV_NV_BUG". This
