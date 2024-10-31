@@ -235,6 +235,14 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    this may well be unnecessary if the argument(s) don't include
    an object constructor.
 
+=head1 DISPLAYING INFS AND NANS
+
+  Originally, infinities and nans were displayed by nv2s() as "inf",
+  "-inf", or "nan". And this is still the guaranteed case if
+  $Math::Ryu::PERL_INFNAN is set to 0 (which is its initial value).
+  If the value of $Math::Ryu::PERL_INFNAN is set to a TRUE value, then
+  infinities and nans will be stringified according to perl's rules.
+
 =head1 LICENSE
 
    This perl module is free software; you may redistribute it

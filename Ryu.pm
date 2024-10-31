@@ -87,6 +87,22 @@ my @tagged = qw(
 my $double_inf = 2 ** 1500;
 my $double_nan = $double_inf / $double_inf;
 
+# If $Math::Ryu::PERL_INFNAN is set to 0, then the string "inf" represents
+# positive infinity, the string "-inf" represents negative infinity, and the
+# string "nan" represents a NaN (not a number).
+# If $Math::Ryu::PERL_INFNAN is set to a true value then the strings will be
+# whatever perl uses to signify positive infinity, negative infinity and nan.
+
+$Math::Ryu::PERL_INFNAN = 0; # Default setting. You can override this
+                             # setting in your code.
+
+$Math::Ryu::pinf = 1e5000;
+$Math::Ryu::ninf = -$Math::Ryu::pinf;
+$Math::Ryu::nanv =  $Math::Ryu::pinf / $Math::Ryu::pinf;
+$Math::Ryu::pinf = "$Math::Ryu::pinf";
+$Math::Ryu::ninf = "$Math::Ryu::ninf";
+$Math::Ryu::nanv = "$Math::Ryu::nanv";
+
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub nv2s {
