@@ -38,23 +38,23 @@ $Math::Ryu::PERL_INFNAN = 1;
 
 $nv = 1e5000;
 cmp_ok(nv2s($nv), 'eq', $Math::Ryu::pinfstr, '+inf stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::pinfstr), '==', $pinfcount, "1: pinf count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::pinfstr), '==', $pinfcount, '1: $pinfcount ok');
 $nv *= -1;
 cmp_ok(nv2s($nv), 'eq', $Math::Ryu::ninfstr, '-inf stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::ninfstr), '==', $ninfcount, "1: ninf count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::ninfstr), '==', $ninfcount, '1: $ninfcount ok');
 $nv /= $nv;
 cmp_ok(nv2s($nv), 'eq', $Math::Ryu::nanvstr, 'nan stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', $nanvcount, "1: nanv count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', $nanvcount, '1: $nanvcount ok');
 
 $nv = 1e5000;
 cmp_ok(fmtpy_pp(NV2S($nv)), 'eq', $Math::Ryu::pinfstr, 'fmtpy_pp: +inf stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::pinfstr), '==', $pinfcount, "2: pinf count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::pinfstr), '==', $pinfcount, '2: $pinfcount ok');
 $nv *= -1;
 cmp_ok(fmtpy_pp(NV2S($nv)), 'eq', $Math::Ryu::ninfstr, 'fmtpy_pp: -inf stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::ninfstr), '==', $ninfcount, "2: ninf count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::ninfstr), '==', $ninfcount, '2: $ninfcount ok');
 $nv /= $nv;
 cmp_ok(fmtpy_pp(NV2S($nv)), 'eq', $Math::Ryu::nanvstr, 'fmtpy_pp: nan stringifies as per perl');
-cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', $nanvcount, "2: nanv count ok");
+cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', $nanvcount, '2: $nanvcount ok');
 
 done_testing();
 __END__
