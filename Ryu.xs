@@ -297,11 +297,11 @@ SV * fmtpy(pTHX_ SV * in) {
     if(s[0] == 'I') {
       if(is_neg) {
         s--;
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::ninf", 0)), 0);
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::ninfstr", 0)), 0);
         return newSVpv("-inf", 0);
       }
       else {
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::pinf", 0)), 0);
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::pinfstr", 0)), 0);
         return newSVpv("inf", 0);
       }
     }
@@ -310,7 +310,7 @@ SV * fmtpy(pTHX_ SV * in) {
         s--;
         croak("rubbish input of '%s'", s);
       }
-      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::nanv", 0)), 0);
+      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::nanvstr", 0)), 0);
       return newSVpv("nan", 0);
     }
     /* mantissa is single-digit */

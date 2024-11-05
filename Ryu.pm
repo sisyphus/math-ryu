@@ -99,9 +99,9 @@ $Math::Ryu::PERL_INFNAN = 0; # Default setting. You can override this
 my $pinf = 1e5000;
 my $ninf = -$pinf;
 my $nanv =  $pinf / $pinf;
-$Math::Ryu::pinf = "$pinf";
-$Math::Ryu::ninf = "$ninf";
-$Math::Ryu::nanv = "$nanv";
+$Math::Ryu::pinfstr = "$pinf";
+$Math::Ryu::ninfstr = "$ninf";
+$Math::Ryu::nanvstr = "$nanv";
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -189,9 +189,9 @@ sub fmtpy_pp {
     # Return '-inf', 'inf', or 'nan' if (and as) appropriate.
     if($s =~ /n/i) {
       if($Math::Ryu::PERL_INFNAN) {
-        return $Math::Ryu::nanv if $s =~ /a/i;
-        return $Math::Ryu::ninf if $sign;
-        return $Math::Ryu::pinf;
+        return $Math::Ryu::nanvstr if $s =~ /a/i;
+        return $Math::Ryu::ninfstr if $sign;
+        return $Math::Ryu::pinfstr;
       }
       return $sign . lc(substr($s, 0, 3));
     }
