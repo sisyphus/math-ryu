@@ -77,7 +77,7 @@ my @tagged = qw(
   n2s
   s2d
   fmtpy fmtpy_pp
-  ryu_lln ryu_SvIOK ryu_SvNOK ryu_SvPOK ryu_SvIOKp
+  ryu_lln ryu_refcnt ryu_SvIOK ryu_SvNOK ryu_SvPOK ryu_SvIOKp
   );
 
 @Math::Ryu::EXPORT = ();
@@ -96,12 +96,12 @@ my $double_nan = $double_inf / $double_inf;
 $Math::Ryu::PERL_INFNAN = 0; # Default setting. You can override this
                              # setting in your code.
 
-$Math::Ryu::pinf = 1e5000;
-$Math::Ryu::ninf = -$Math::Ryu::pinf;
-$Math::Ryu::nanv =  $Math::Ryu::pinf / $Math::Ryu::pinf;
-$Math::Ryu::pinf = "$Math::Ryu::pinf";
-$Math::Ryu::ninf = "$Math::Ryu::ninf";
-$Math::Ryu::nanv = "$Math::Ryu::nanv";
+my $pinf = 1e5000;
+my $ninf = -$pinf;
+my $nanv =  $pinf / $pinf;
+$Math::Ryu::pinf = "$pinf";
+$Math::Ryu::ninf = "$ninf";
+$Math::Ryu::nanv = "$nanv";
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -187,7 +187,14 @@ sub fmtpy_pp {
   }
   else {
     # Return '-inf', 'inf', or 'nan' if (and as) appropriate.
-    return $sign . lc(substr($s, 0, 3)) if $s =~ /n/i;
+    if($s =~ /n/i) {
+      if($Math::Ryu::PERL_INFNAN) {
+        return $Math::Ryu::nanv if $s =~ /a/i;
+        return $Math::Ryu::ninf if $sign;
+        return $Math::Ryu::pinf;
+      }
+      return $sign . lc(substr($s, 0, 3));
+    }
 
     # Append '.0' to the mantissa and return it if the exponent is 0.
     return $sign . $s . '.0' if $s =~ s/E0$//i;
