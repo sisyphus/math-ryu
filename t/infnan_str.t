@@ -56,6 +56,19 @@ $nv /= $nv;
 cmp_ok(fmtpy_pp(NV2S($nv)), 'eq', $Math::Ryu::nanvstr, 'fmtpy_pp: nan stringifies as per perl');
 cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', $nanvcount, '2: $nanvcount ok');
 
+my($x, $y, $z) = (\$Math::Ryu::pinfstr, \$Math::Ryu::ninfstr, \$Math::Ryu::nanvstr);
+
+cmp_ok(ryu_refcnt($Math::Ryu::pinfstr), '==', 2, '$Math::Ryu::pinfstr refcount is 2');
+cmp_ok(ryu_refcnt($Math::Ryu::ninfstr), '==', 2, '$Math::Ryu::ninfstr refcount is 2');
+cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', 2, '$Math::Ryu::nanvstr refcount is 2');
+
+my $s = nv2s($nv);
+cmp_ok($s, 'eq', $Math::Ryu::nanvstr, "\$s is '$Math::Ryu::nanvstr'");
+cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', 2, '$Math::Ryu::nanvstr refcount is still 2');
+
+$z = 'hello world';
+cmp_ok(ryu_refcnt($Math::Ryu::nanvstr), '==', 1, '$Math::Ryu::nanvstr refcount is back to 1');
+
 done_testing();
 __END__
 
