@@ -134,6 +134,13 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     in the format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
     '1.4142135623730950488016887242096982E0' (for square root of 2).
 
+  $str = fx2s($nv);
+    Cast $nv to a single precision float value.
+    Returns a decimal string representation of that single precision
+    float value in the format 'mantissaEexponent' - eg:
+      '1E-1' (for 0.1) and
+      '1.4142135E0' (for square root of 2).
+
   $bool = is_NV($arg);
     Returns 1 if $arg should be deemed an NV (perl scalar floating
     point value) for the purposes of this module.

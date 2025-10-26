@@ -98,4 +98,8 @@ cmp_ok(nv2s(-$nv),  'eq', '-6.125e+' . "$nvprec", "-6.125e+${nvprec}  ok");
 cmp_ok(fmtpy_pp(NV2S($nv)),  'eq', '6.125e+' . "$nvprec", "6.125e+${nvprec} fmtpy_pp ok");
 cmp_ok(fmtpy_pp(NV2S(-$nv)),  'eq', '-6.125e+' . "$nvprec", "-6.125e+${nvprec} fmtpy_pp ok");
 
+like(fx2s(sqrt(2)), qr/^1\.4142135E0$/i, "fx2s() handles sqrt(2) correctly");
+like(fx2s(sqrt(3)), qr/^1\.7320508E0$/i, "fx2s() handles sqrt(3) correctly");
+
+
 done_testing();

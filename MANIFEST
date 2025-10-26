@@ -9,6 +9,7 @@ Ryu.pod
 Ryu.xs
 d2fixed.c
 d2s.c
+f2s.c
 s2d.c
 
 t/1_basic.t
