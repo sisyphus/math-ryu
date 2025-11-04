@@ -216,8 +216,17 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    If that NV fits into an IV, then cast it to an IV, and print out
    that (IV) value. Else print out nv2s($arg).
 
+   NOTE: If perl's NV precision is less than IV precision (as is the most
+         most common perl configuration) then pany() can produce a result
+         that differs from nv2s(). Eg: pany(6.886264645392433e+16) will,
+         in accordance with this documentation, output 68862646453924328.
+         But nv2s(6.886264645392433e+16) will, in accordance with its
+         documentation return the float string 6.886264645392433e+16.
+         Aside from that, "pany($nv);" and "print nv2s($nv);" will
+         produce identical outputs - assuming $nv is an NV, of course.
+
    For all other arguments (ie those for which looks_like_number($arg)
-   has returned false), simply "print $_;".
+   has returned false), pany() will simply "print $_;".
 
    After sany() has printed the final arg, a terminating "\n" is printed.
    Otherwise sany() and pany() are identical.
@@ -228,8 +237,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    for the user to ever call perl's print()/say() functions if
    Math::Ryu has been loaded.
    Of course, if you really do want to print out an NV as stringified
-   by perl (as opposed to being stringified by nv2s) then you'll need
-   to use print/say, not pany/sany.
+   by perl then you'll need to use print/say, not pany/sany.
 
    Unlike "print" and "say", which are generally called without
    bracketed args, "pany()" and "sany()" should be called with their
