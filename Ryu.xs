@@ -94,6 +94,10 @@ SV * q2s(pTHX_ SV * nv) {
 #endif
 }
 
+SV * fx2s(pTHX_ SV * nv) {
+  return newSVpv(f2s((float)SvNV(nv)), 0);
+}
+
 int ryu_SvIOK(SV * sv) {
     if(SvIOK(sv)) return 1;
     return 0;
@@ -436,6 +440,13 @@ q2s (nv)
 	SV *	nv
 CODE:
   RETVAL = q2s (aTHX_ nv);
+OUTPUT:  RETVAL
+
+SV *
+fx2s (nv)
+	SV *	nv
+CODE:
+  RETVAL = fx2s (aTHX_ nv);
 OUTPUT:  RETVAL
 
 int
