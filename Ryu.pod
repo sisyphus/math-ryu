@@ -43,11 +43,12 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
                           # the condition ("0.1" == 0.1) is also true.
 
    This module provides the nv2s() function which returns a decimal
-   string representation of its (NV) argumennt. Unless $nv is NaN:
+   string representation of its (NV) argument.
+   Unless $nv is NaN:
     1) the condition ( nv2s($nv) == $nv ) is always true;
       and
     2) the string returned by nv2s($nv) will contain the fewest number of
-       siginificant decimal digits needed for that first condition to hold.
+       significant decimal digits needed for that first condition to hold.
 
    The aim is that the formatting of the string returned by nv2s() will
    be the same as provided by python3's print() function.
@@ -217,7 +218,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    that (IV) value. Else print out nv2s($arg).
 
    NOTE: If perl's NV precision is less than IV precision (as is the most
-         most common perl configuration) then pany() can produce a result
+         common perl configuration) then pany() can produce a result
          that differs from nv2s(). Eg: pany(6.886264645392433e+16) will,
          in accordance with this documentation, output 68862646453924328.
          But nv2s(6.886264645392433e+16) will, in accordance with its
