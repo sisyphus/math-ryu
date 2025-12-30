@@ -11,7 +11,7 @@ my $ccflags = $Config::Config{ccflags}; # Below, we will append '-std=c99' to th
 my $mycc    = '';
 my $avoid_generic_128 = 0;
 $avoid_generic_128 = 1
-  if ($Config::Config{make} eq 'dmake' || $Config::Config{make} eq 'dmake');
+  if ($Config::Config{make} eq 'dmake');
 
 $defines .= ' -DAVOID_GENERIC_128'
   if $avoid_generic_128;
@@ -95,7 +95,7 @@ my %options = (
 );
 
 if($defines !~ /\-DCOMPILER/ || $avoid_generic_128) {
-  # Compile d2s.c, s2d.c and d2fixed.c
+  # Compile f2s.c, d2s.c, s2d.c and d2fixed.c
   # NOTE: The current Ryu_Library/ryu/Makefile
   #       won't work with 'nmake' and 'dmake'.
   $options{OBJECT} = '$(O_FILES)';
