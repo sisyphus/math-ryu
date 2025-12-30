@@ -286,7 +286,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    The Boost Software License can be found at:
    https://www.boost.org/LICENSE_1_0.txt
 
-   This perl module is Copyright 2024 Sisyphus
+   This perl module is Copyright 2024-25 Sisyphus
 =head1 AUTHOR
 
    Sisyphus <sisyphus at(@) cpan dot (.) org>
