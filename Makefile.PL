@@ -3,11 +3,20 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Cwd;
 
+# A cpantester's build of perl was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
+# envirnoment variable - which was overriding the assignemt to $options{LIBS} below,
+# at line 115.
+# See https://www.cpantesters.org/cpan/report/243224aa-6c9a-1014-a249-f265ef72f936 .
+# The following substitution regex works around the problem.
+{
+  no warnings 'uninitialized'; # It doesn't matter if $ENV{PERL_MM_OPT} is uninitialized.
+  $ENV{PERL_MM_OPT} =~ s/\sLIBS=\-lquadmath//;
+}
+
 # We need to know whether the __uint128_t type is available.
 my $defines = '';
 my $ccflags = $Config::Config{ccflags}; # Below, we will append '-std=c99' to the
                                         # CCFLAGS, if we detect that it's necessary.
-
 my $mycc    = '';
 my $avoid_generic_128 = 0;
 $avoid_generic_128 = 1
@@ -103,7 +112,6 @@ if($defines !~ /\-DCOMPILER/ || $avoid_generic_128) {
 }
 else {
   # Build libryu.a and build against it
-
   $options{LIBS} = [ "-L${top_dir}/${lib_loc} -lryu" ];
 }
 WriteMakefile(%options);
