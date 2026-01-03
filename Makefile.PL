@@ -61,6 +61,9 @@ $top_dir =~ s/\\/\//g;
 
 my $lib_loc = 'Ryu_Library/ryu';
 
+$defines .= ' -Dinline=__inline'
+   if ($^O eq 'MSWin32' && $Config::Config{cc} eq 'cl');
+
 if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
   ## BUILD RYU LIBRARY ##
   if(chdir "./$lib_loc") {
