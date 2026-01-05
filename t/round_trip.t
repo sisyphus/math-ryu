@@ -96,7 +96,7 @@ if( $] >= 5.030 || $Config{nvtype} eq '__float128' || $Config{nvtype} eq 'double
 
       $nv /= 10 unless $count % 3;
 
-      if( $use_s2d ) {
+      if( $use_s2d eq 'ALL' || ($use_s2d eq 'MSVC' && $exp < -305) ) {
         cmp_ok(s2d(nv2s($nv)), '==', $nv, sprintf("$format", $nv) . ": round trip succeeds");
       }
       else {
