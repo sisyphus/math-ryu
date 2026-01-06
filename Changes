@@ -1,3 +1,5 @@
+1.11
+
 1.09
      - Add "-Dinline=__inline" to compiler flags when building with Visual Studio as
        this is needed by pre-VS2022 C compilations.
