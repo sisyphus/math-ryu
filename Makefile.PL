@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use Cwd;
 
 # A cpantester's build of perl is/was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
-# envirnoment variable - which overrides the assignemt to $options{LIBS} below,
+# envirnoment variable - which overrides the assignment to $options{LIBS} below,
 # at line 115.
 # See https://www.cpantesters.org/cpan/report/243224aa-6c9a-1014-a249-f265ef72f936 .
 # The following substitution regex works around the problem.
@@ -87,6 +87,7 @@ if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
 my %options = (
 
   NAME => 'Math::Ryu',
+  AUTHOR => 'Sisyphus (sisyphus359 at (@) gmail dot (.) com)',
   PREREQ_PM    => { 'Test::More' => '0.88', },
   DEFINE       => $defines,
   CCFLAGS      => $ccflags,

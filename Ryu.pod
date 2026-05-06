@@ -289,6 +289,6 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    This perl module is Copyright 2024-25 Sisyphus
 =head1 AUTHOR
 
-   Sisyphus <sisyphus at(@) cpan dot (.) org>
+   Sisyphus <sisyphus359 at(@) gmail dot (.) com>
 
 =cut
